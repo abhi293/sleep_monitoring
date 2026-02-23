@@ -26,3 +26,9 @@ seaborn>=0.12
 joblib>=1.3               # parallel preprocessing workers
 tqdm>=4.65                # progress bars
 pyyaml>=6.0               # YAML config loading
+
+#how to run the script :
+#CUDA_VISIBLE_DEVICES="" python train.py --mopso --mopso_iter 10 --mopso_particles 10 --epochs 50
+
+#and to run diretly :
+#python train.py --epochs 50

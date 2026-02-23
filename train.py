@@ -115,6 +115,9 @@ def main() -> None:
     log_dir   = cfg["training"]["log_dir"]
     ckpt_dir  = cfg["training"]["checkpoint_dir"]
     setup_logging(log_dir=log_dir)
+
+    logging.getLogger("src.preprocessing").setLevel(logging.WARNING)
+
     configure_tf_cpu(n_cores=N_CORES)
     tf.config.threading.set_intra_op_parallelism_threads(N_CORES)
     tf.config.threading.set_inter_op_parallelism_threads(N_CORES)
@@ -207,8 +210,8 @@ def main() -> None:
         mopso = MOPSO(
             n_particles=n_particles,
             max_iter=n_iter,
-            n_jobs=N_CORES,
-            quick_epochs=5 if not args.smoke_test else 2,
+            n_jobs=1,
+            quick_epochs=1 if not args.smoke_test else 1,
             pareto_dir=cfg["mopso"]["pareto_dir"],
         )
         pareto = mopso.optimize(mopso_data, n_features=n_features)

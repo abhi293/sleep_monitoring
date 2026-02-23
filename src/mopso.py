@@ -131,11 +131,18 @@ def _evaluate_candidate(
     import warnings
     warnings.filterwarnings("ignore")
 
-    # Lazy import inside worker to avoid multiprocessing issues with TF
-    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
-    import tensorflow as tf
-    tf.config.threading.set_intra_op_parallelism_threads(1)
-    tf.config.threading.set_inter_op_parallelism_threads(1)
+    import sys
+    if "tensorflow" not in sys.modules:
+        # Running in a subprocess worker — force CPU and suppress CUDA noise
+        os.environ["CUDA_VISIBLE_DEVICES"]   = ""
+        os.environ["TF_CPP_MIN_LOG_LEVEL"]   = "3"
+        os.environ["TF_ENABLE_ONEDNN_OPTS"]  = "1"
+        import tensorflow as tf
+        tf.config.threading.set_intra_op_parallelism_threads(1)
+        tf.config.threading.set_inter_op_parallelism_threads(1)
+    else:
+        # Already in the main process with TF configured — just alias it
+        import tensorflow as tf
 
     from src.model import build_from_config
     from src.preprocessing import create_windows, apply_scaler
@@ -161,9 +168,10 @@ def _evaluate_candidate(
                               class_weights=data.get("class_weights"))
 
     # Sub-sample aggressively for speed during MOPSO fitness calls
-    max_tr = min(len(X_tr), 4000)
+    # Kept small so each CPU trial finishes in ~15-30 s
+    max_tr = min(len(X_tr), 800)
     idx_tr = np.random.choice(len(X_tr), max_tr, replace=False)
-    max_va = min(len(X_va), 1000)
+    max_va = min(len(X_va), 300)
     idx_va = np.random.choice(len(X_va), max_va, replace=False)
 
     model.fit(
@@ -171,7 +179,7 @@ def _evaluate_candidate(
         validation_data=(X_va[idx_va], y_va[idx_va]),
         epochs=quick_epochs,
         batch_size=256,
-        verbose=0,
+        verbose=1,
     )
 
     loss, acc = model.evaluate(X_va[idx_va], y_va[idx_va], verbose=0)
@@ -219,9 +227,9 @@ class MOPSO:
     def __init__(
         self,
         n_particles: int = 10,
-        max_iter: int = 15,
-        n_jobs: int = 4,
-        quick_epochs: int = 3,
+        max_iter: int = 10,
+        n_jobs: int = 1,
+        quick_epochs: int = 1,
         pareto_dir: str = "mopso_results",
         w: float = 0.5,
         c1: float = 1.5,
@@ -275,7 +283,7 @@ class MOPSO:
         p.position = np.clip(p.position + p.velocity, 0.0, 1.0)
         return p
 
-    # ── Evaluate swarm in parallel ────────────────────────────
+    # ── Evaluate swarm in parallel (or sequentially for n_jobs=1) ──────────
 
     def _evaluate_swarm(
         self,
@@ -286,10 +294,17 @@ class MOPSO:
         positions = [p.position for p in particles]
         hyperparams_list = [_decode_position(pos) for pos in positions]
 
-        objectives_list = Parallel(n_jobs=self.n_jobs, backend="loky", verbose=0)(
-            delayed(_evaluate_candidate)(hp, data, self.quick_epochs, n_features)
-            for hp in hyperparams_list
-        )
+        if self.n_jobs == 1:
+            # Run in the main process — no forking, no data pickling, no OOM
+            objectives_list = [
+                _evaluate_candidate(hp, data, self.quick_epochs, n_features)
+                for hp in hyperparams_list
+            ]
+        else:
+            objectives_list = Parallel(n_jobs=self.n_jobs, backend="loky", verbose=0)(
+                delayed(_evaluate_candidate)(hp, data, self.quick_epochs, n_features)
+                for hp in hyperparams_list
+            )
         return [np.array(obj) for obj in objectives_list]
 
     # ── Main optimization loop ────────────────────────────────

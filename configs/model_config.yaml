@@ -76,7 +76,7 @@ training:
 
 mopso:
   n_particles: 10
-  max_iter: 15
+  max_iter: 10
   n_jobs: 4                  # parallel fitness evaluations
   quick_epochs: 3            # epochs per candidate during MOPSO
   # Objectives: accuracy, false_alarm_rate, param_count
