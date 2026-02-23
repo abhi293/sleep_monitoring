@@ -333,3 +333,27 @@
 2026-02-23 21:42:56 [INFO] __main__: Stage 2/4 — MOPSO hyperparameter optimisation …
 2026-02-23 21:42:58 [INFO] src.mopso: Starting MOPSO: 10 particles × 10 iterations on 1 workers
 2026-02-23 21:45:16 [INFO] src.mopso: MOPSO iter 01/10 | archive=3 | best_1-acc=0.4333 | 138.2s/iter | ETA 1244s
+2026-02-23 21:47:40 [INFO] src.mopso: MOPSO iter 02/10 | archive=5 | best_1-acc=0.4333 | 144.4s/iter | ETA 1130s
+2026-02-23 21:50:12 [INFO] src.mopso: MOPSO iter 03/10 | archive=8 | best_1-acc=0.4333 | 151.5s/iter | ETA 1013s
+2026-02-23 21:52:50 [INFO] src.mopso: MOPSO iter 04/10 | archive=9 | best_1-acc=0.4333 | 157.9s/iter | ETA 888s
+2026-02-23 21:55:33 [INFO] src.mopso: MOPSO iter 05/10 | archive=9 | best_1-acc=0.4333 | 163.2s/iter | ETA 755s
+2026-02-23 21:58:23 [INFO] src.mopso: MOPSO iter 06/10 | archive=9 | best_1-acc=0.3367 | 169.8s/iter | ETA 617s
+2026-02-23 22:01:21 [INFO] src.mopso: MOPSO iter 07/10 | archive=8 | best_1-acc=0.3367 | 177.7s/iter | ETA 473s
+2026-02-23 22:14:02 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-02-23 22:14:02 [INFO] __main__: ════════════════════════════════════════════════════════════
+2026-02-23 22:14:02 [INFO] __main__:   Sleep Intelligence System — Training
+2026-02-23 22:14:02 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-02-23 22:14:02 [INFO] __main__: ════════════════════════════════════════════════════════════
+2026-02-23 22:14:02 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-02-23 22:14:07 [INFO] src.utils: Scaler saved → checkpoints/scaler.pkl
+2026-02-23 22:14:07 [INFO] __main__: Data ready → train: (17790, 30, 22) | val: (2089, 30, 22) | test: (2205, 30, 22)  (5.0s)
+2026-02-23 22:14:07 [INFO] __main__: Stage 2/4 — MOPSO hyperparameter optimisation …
+2026-02-23 22:14:09 [INFO] src.mopso: Starting MOPSO: 10 particles × 10 iterations on 1 workers
+2026-02-23 22:16:30 [INFO] src.mopso: MOPSO iter 01/10 | archive=3 | best_1-acc=0.4333 | 141.3s/iter | ETA 1272s
+2026-02-23 22:18:57 [INFO] src.mopso: MOPSO iter 02/10 | archive=6 | best_1-acc=0.4333 | 146.2s/iter | ETA 1150s
+2026-02-23 22:21:28 [INFO] src.mopso: MOPSO iter 03/10 | archive=4 | best_1-acc=0.3867 | 151.6s/iter | ETA 1025s
+2026-02-23 22:24:06 [INFO] src.mopso: MOPSO iter 04/10 | archive=5 | best_1-acc=0.3867 | 158.1s/iter | ETA 896s
+2026-02-23 22:26:50 [INFO] src.mopso: MOPSO iter 05/10 | archive=7 | best_1-acc=0.3867 | 163.5s/iter | ETA 761s
+2026-02-23 22:29:39 [INFO] src.mopso: MOPSO iter 06/10 | archive=7 | best_1-acc=0.3867 | 169.6s/iter | ETA 620s
+2026-02-23 22:32:38 [INFO] src.mopso: MOPSO iter 07/10 | archive=9 | best_1-acc=0.3867 | 179.0s/iter | ETA 475s
+2026-02-23 22:35:44 [INFO] src.mopso: MOPSO iter 08/10 | archive=11 | best_1-acc=0.3567 | 185.5s/iter | ETA 324s
