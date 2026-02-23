@@ -54,6 +54,7 @@ from src.utils import (
     setup_logging, compute_metrics, hrv_recovery_score,
     sleep_quality_score, load_scaler, save_metrics,
     plot_confusion_matrix, plot_hypnogram, plot_pareto_front,
+    generate_all_plots, plot_stage_probabilities,
 )
 
 logger = logging.getLogger(__name__)
@@ -147,47 +148,24 @@ def evaluate_and_report(
 
     # ── Save outputs ────────────────────────────────────────────
     save_metrics(metrics, str(Path(out_dir) / f"{tag}_metrics.json"))
-    plot_confusion_matrix(y, y_pred, stage_names,
-                          str(Path(out_dir) / f"{tag}_confusion_matrix.png"))
-    plot_hypnogram(y_pred,  stage_names,
-                   str(Path(out_dir) / f"{tag}_hypnogram.png"),
-                   f"Predicted Hypnogram – {tag}")
 
-    # Probability confidence over time
-    _plot_stage_probabilities(y_prob, stage_names,
-                              str(Path(out_dir) / f"{tag}_stage_probs.png"), tag)
+    # Comprehensive plot suite
+    generate_all_plots(
+        y_true=y,
+        y_pred=y_pred,
+        y_prob=y_prob,
+        metrics=metrics,
+        history=None,
+        pareto_archive=None,
+        feature_names=feature_cols,
+        X_flat=X[:min(5000, len(X)), -1, :],   # last timestep per window
+        stage_names=stage_names,
+        out_dir=out_dir,
+    )
 
     logger.info("Evaluation report saved to %s/", out_dir)
     return metrics
 
-
-def _plot_stage_probabilities(
-    y_prob: np.ndarray,
-    stage_names: list,
-    save_path: str,
-    title: str = "",
-) -> None:
-    """Plot predicted class probabilities over time."""
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    colors = ["#e74c3c", "#3498db", "#2ecc71", "#9b59b6"]
-    fig, ax = plt.subplots(figsize=(16, 5))
-    t = np.arange(len(y_prob))
-    for i, (name, col) in enumerate(zip(stage_names, colors)):
-        ax.plot(t, y_prob[:, i], label=name, color=col, linewidth=1.0, alpha=0.8)
-    ax.set_xlim(0, len(t) - 1)
-    ax.set_ylim(0, 1)
-    ax.set_xlabel("Window index (time →)", fontsize=11)
-    ax.set_ylabel("Predicted probability", fontsize=11)
-    ax.set_title(f"Stage Probability over Time — {title}", fontsize=13, fontweight="bold")
-    ax.legend(loc="upper right", ncol=4)
-    ax.grid(True, alpha=0.3)
-    plt.tight_layout()
-    Path(save_path).parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(save_path, dpi=150, bbox_inches="tight")
-    plt.close()
 
 
 # ────────────────────────────────────────────────────────────────

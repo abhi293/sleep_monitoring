@@ -58,6 +58,8 @@ from src.utils import (
     sleep_quality_score, save_scaler, save_metrics,
     plot_training_history, plot_confusion_matrix,
     plot_hypnogram, plot_pareto_front,
+    generate_all_plots, plot_class_distribution,
+    STAGE_NAMES,
 )
 
 logger = logging.getLogger(__name__)
@@ -345,15 +347,33 @@ def main() -> None:
     save_metrics(metrics, str(Path(log_dir) / "test_metrics.json"))
 
     # ── Plots ──────────────────────────────────────────────────
-    plot_training_history(history, str(Path(log_dir) / "training_curves.png"))
-    plot_confusion_matrix(y_test, y_pred,
-                          stage_names=data["stage_names"],
-                          save_path=str(Path(log_dir) / "confusion_matrix.png"))
-    # Predict a single test user's night for the hypnogram
-    plot_hypnogram(y_pred[:min(480, len(y_pred))],
-                   stage_names=data["stage_names"],
-                   save_path=str(Path(log_dir) / "hypnogram_sample.png"),
-                   title="Predicted Sleep Hypnogram (first test session)")
+    # Pre-training class distribution (using raw train labels)
+    plot_class_distribution(
+        y_train, data["stage_names"],
+        str(Path(log_dir) / "class_distribution_train.png"),
+        "Training Set — Class Distribution",
+    )
+
+    # Build flat feature matrix for correlation plot (subsample to save memory)
+    subsample_n = min(5000, len(X_test))
+    X_flat = X_test[:subsample_n].reshape(subsample_n, -1)
+    # Use tiled feature names to match the flattened window
+    feat_names_flat = [f"{fn}_t{t}" for t in range(X_test.shape[1])
+                       for fn in cfg["data"]["feature_cols"]]
+
+    # Generate full comprehensive plot suite
+    generate_all_plots(
+        y_true=y_test,
+        y_pred=y_pred,
+        y_prob=y_pred_prob,
+        metrics=metrics,
+        history=history,
+        pareto_archive=None,
+        feature_names=cfg["data"]["feature_cols"],
+        X_flat=X_test[:subsample_n, -1, :],   # last timestep per window
+        stage_names=data["stage_names"],
+        out_dir=log_dir,
+    )
 
     logger.info("All outputs saved to '%s/' and '%s/'", log_dir, ckpt_dir)
     logger.info("Done ✓")
