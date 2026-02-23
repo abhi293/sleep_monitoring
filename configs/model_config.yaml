@@ -5,6 +5,7 @@
 data:
   dataset_path: "realistic_sleep_dataset_v4.csv"
   feature_cols:
+    # Base sensor signals
     - HR
     - RMSSD
     - HR_Stability
@@ -16,6 +17,19 @@ data:
     - Ambient_Temp
     - Humidity
     - Light_Lux
+    # Temporal deltas (auto-engineered)
+    - HR_delta
+    - RMSSD_delta
+    - SpO2_delta
+    - Resp_Rate_delta
+    - SVM_delta
+    - Body_Temp_delta
+    # Rolling statistics (auto-engineered)
+    - HR_roll5_mean
+    - HR_roll5_std
+    - RMSSD_roll5_mean
+    - RMSSD_roll5_std
+    - SpO2_roll5_mean
   label_col: Stage
   stage_map:
     Awake: 0
@@ -46,6 +60,7 @@ model:
   dense_units: 128
   dropout: 0.30
   num_classes: 4
+  focal_gamma: 2.0          # focal loss gamma (0 = standard CE)
 
 training:
   epochs: 50
@@ -60,9 +75,10 @@ training:
   log_dir: "logs"
 
 mopso:
-  n_particles: 20
-  max_iter: 30
+  n_particles: 10
+  max_iter: 15
   n_jobs: 4                  # parallel fitness evaluations
+  quick_epochs: 3            # epochs per candidate during MOPSO
   # Objectives: accuracy, false_alarm_rate, param_count
   objectives: [accuracy, false_alarm_rate, param_count]
   search_space:

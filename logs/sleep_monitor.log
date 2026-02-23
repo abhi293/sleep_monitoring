@@ -1,44 +1,43 @@
-2026-02-23 20:26:43 [INFO] src.utils: TF CPU parallelism configured: 4 threads
-2026-02-23 20:26:43 [INFO] __main__: ════════════════════════════════════════════════════════════
-2026-02-23 20:26:43 [INFO] __main__:   Sleep Intelligence System — Training
-2026-02-23 20:26:43 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
-2026-02-23 20:26:43 [INFO] __main__: ════════════════════════════════════════════════════════════
-2026-02-23 20:26:43 [INFO] __main__: Smoke-test mode: reduced epochs/data
-2026-02-23 20:26:43 [INFO] __main__: Stage 1/4 — Preprocessing …
-2026-02-23 20:26:43 [INFO] src.preprocessing: Loading dataset from realistic_sleep_dataset_v4.csv …
-2026-02-23 20:26:44 [INFO] src.preprocessing: Dataset loaded: 176155 rows × 17 cols | stages: {'Light': 90193, 'Awake': 31918, 'Deep': 29163, 'REM': 24881}
-2026-02-23 20:26:44 [INFO] src.preprocessing: Split → train 22 users (130280 rows) | val 4 users (22361 rows) | test 4 users (23514 rows)
-2026-02-23 20:26:44 [INFO] src.preprocessing: Windowing 330 user-day groups (window=20, stride=10) on 4 workers …
-2026-02-23 20:26:47 [INFO] src.preprocessing: Windows created: X=(12544, 20, 11)  y=(12544,)
-2026-02-23 20:26:47 [INFO] src.preprocessing: Windowing 60 user-day groups (window=20, stride=10) on 4 workers …
-2026-02-23 20:26:47 [INFO] src.preprocessing: Windows created: X=(2149, 20, 11)  y=(2149,)
-2026-02-23 20:26:47 [INFO] src.preprocessing: Windowing 60 user-day groups (window=20, stride=10) on 4 workers …
-2026-02-23 20:26:47 [INFO] src.preprocessing: Windows created: X=(2265, 20, 11)  y=(2265,)
-2026-02-23 20:26:47 [INFO] src.preprocessing: Class weights: {0: 1.4592833876221498, 1: 0.4822389666307858, 2: 1.4505087881591119, 3: 1.8127167630057803}
-2026-02-23 20:26:47 [INFO] src.utils: Scaler saved → checkpoints/scaler.pkl
-2026-02-23 20:26:47 [INFO] __main__: Data ready → train: (12544, 20, 11) | val: (2149, 20, 11) | test: (2265, 20, 11)  (3.8s)
-2026-02-23 20:26:47 [INFO] __main__: Smoke-test: using 2000/500/500 samples
-2026-02-23 20:26:47 [INFO] __main__: Stage 2/4 — MOPSO skipped (use --mopso to enable)
-2026-02-23 20:26:47 [INFO] __main__: Stage 3/4 — Building model …
-2026-02-23 20:26:47 [INFO] __main__: Stage 4/4 — Training …
-2026-02-23 20:26:58 [INFO] __main__: Training completed in 11.2s
-2026-02-23 20:26:59 [INFO] __main__: Loaded best checkpoint: checkpoints/best_model.keras
-2026-02-23 20:26:59 [INFO] __main__: Evaluating on test set …
-2026-02-23 20:27:00 [INFO] __main__: ════════════════════════════════════════════════════════════
-2026-02-23 20:27:00 [INFO] __main__:   TEST RESULTS
-2026-02-23 20:27:00 [INFO] __main__:   Accuracy        : 0.7020
-2026-02-23 20:27:00 [INFO] __main__:   Cohen's Kappa   : 0.4665
-2026-02-23 20:27:00 [INFO] __main__:   Mean FAR        : 0.1488
-2026-02-23 20:27:00 [INFO] __main__:   Sleep Efficiency: 0.8500
-2026-02-23 20:27:00 [INFO] __main__:   Sleep Quality ↑ : 69.51 / 100
-2026-02-23 20:27:00 [INFO] __main__: ════════════════════════════════════════════════════════════
-2026-02-23 20:27:00 [INFO] __main__:   Awake  → P=0.867 R=0.867 F1=0.867  FAR=0.024
-2026-02-23 20:27:00 [INFO] __main__:   Light  → P=0.674 R=0.912 F1=0.775  FAR=0.526
-2026-02-23 20:27:00 [INFO] __main__:   Deep   → P=0.679 R=0.439 F1=0.533  FAR=0.041
-2026-02-23 20:27:00 [INFO] __main__:   REM    → P=0.500 R=0.028 F1=0.053  FAR=0.005
-2026-02-23 20:27:00 [INFO] src.utils: Metrics saved → logs/test_metrics.json
-2026-02-23 20:27:00 [INFO] src.utils: Training curves saved → logs/training_curves.png
-2026-02-23 20:27:01 [INFO] src.utils: Confusion matrix saved → logs/confusion_matrix.png
-2026-02-23 20:27:02 [INFO] src.utils: Hypnogram saved → logs/hypnogram_sample.png
-2026-02-23 20:27:02 [INFO] __main__: All outputs saved to 'logs/' and 'checkpoints/'
-2026-02-23 20:27:02 [INFO] __main__: Done ✓
+2026-02-23 20:46:29 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-02-23 20:46:29 [INFO] __main__: ════════════════════════════════════════════════════════════
+2026-02-23 20:46:29 [INFO] __main__:   Sleep Intelligence System — Training
+2026-02-23 20:46:29 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-02-23 20:46:29 [INFO] __main__: ════════════════════════════════════════════════════════════
+2026-02-23 20:46:29 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-02-23 20:46:29 [INFO] src.preprocessing: Loading dataset from realistic_sleep_dataset_v4.csv …
+2026-02-23 20:46:31 [INFO] src.preprocessing: Dataset loaded: 176155 rows × 28 cols | stages: {'Light': 90193, 'Awake': 31918, 'Deep': 29163, 'REM': 24881}
+2026-02-23 20:46:31 [INFO] src.preprocessing: Split → train 22 users (130280 rows) | val 4 users (22361 rows) | test 4 users (23514 rows)
+2026-02-23 20:46:31 [INFO] src.preprocessing: Windowing 330 user-day groups (window=30, stride=10) on 4 workers …
+2026-02-23 20:46:33 [INFO] src.preprocessing: Windows created: X=(12214, 30, 22)  y=(12214,)
+2026-02-23 20:46:33 [INFO] src.preprocessing: Windowing 60 user-day groups (window=30, stride=10) on 4 workers …
+2026-02-23 20:46:33 [INFO] src.preprocessing: Windows created: X=(2089, 30, 22)  y=(2089,)
+2026-02-23 20:46:33 [INFO] src.preprocessing: Windowing 60 user-day groups (window=30, stride=10) on 4 workers …
+2026-02-23 20:46:33 [INFO] src.preprocessing: Windows created: X=(2205, 30, 22)  y=(2205,)
+2026-02-23 20:46:33 [INFO] src.preprocessing: Oversampled minorities → X=(17790, 30, 22)  y distribution: {np.int8(0): np.int64(3812), np.int8(1): np.int64(6354), np.int8(2): np.int64(3812), np.int8(3): np.int64(3812)}
+2026-02-23 20:46:33 [INFO] src.preprocessing: Class weights: {0: 1.7500655823714586, 1: 0.6999527856468366, 2: 1.7500655823714586, 3: 1.7500655823714586}
+2026-02-23 20:46:33 [INFO] src.utils: Scaler saved → checkpoints/scaler.pkl
+2026-02-23 20:46:33 [INFO] __main__: Data ready → train: (17790, 30, 22) | val: (2089, 30, 22) | test: (2205, 30, 22)  (4.7s)
+2026-02-23 20:46:33 [INFO] __main__: Stage 2/4 — MOPSO skipped (use --mopso to enable)
+2026-02-23 20:46:33 [INFO] __main__: Stage 3/4 — Building model …
+2026-02-23 20:46:34 [INFO] __main__: Stage 4/4 — Training …
+2026-02-23 20:48:36 [INFO] __main__: Training completed in 122.5s
+2026-02-23 20:48:36 [INFO] __main__: Loaded best checkpoint: checkpoints/best_model.keras
+2026-02-23 20:48:36 [INFO] __main__: Evaluating on test set …
+2026-02-23 20:48:38 [INFO] __main__: ════════════════════════════════════════════════════════════
+2026-02-23 20:48:38 [INFO] __main__:   TEST RESULTS
+2026-02-23 20:48:38 [INFO] __main__:   Accuracy        : 0.9660
+2026-02-23 20:48:38 [INFO] __main__:   Cohen's Kappa   : 0.9482
+2026-02-23 20:48:38 [INFO] __main__:   Mean FAR        : 0.0108
+2026-02-23 20:48:38 [INFO] __main__:   Sleep Efficiency: 0.8227
+2026-02-23 20:48:38 [INFO] __main__:   Sleep Quality ↑ : 93.64 / 100
+2026-02-23 20:48:38 [INFO] __main__: ════════════════════════════════════════════════════════════
+2026-02-23 20:48:38 [INFO] __main__:   Awake  → P=0.990 R=0.997 F1=0.994  FAR=0.002
+2026-02-23 20:48:38 [INFO] __main__:   Light  → P=0.993 R=0.953 F1=0.972  FAR=0.008
+2026-02-23 20:48:38 [INFO] __main__:   Deep   → P=0.985 R=0.959 F1=0.972  FAR=0.003
+2026-02-23 20:48:38 [INFO] __main__:   REM    → P=0.842 R=0.984 F1=0.907  FAR=0.031
+2026-02-23 20:48:38 [INFO] src.utils: Metrics saved → logs/test_metrics.json
+2026-02-23 20:48:38 [INFO] src.utils: Training curves saved → logs/training_curves.png
+2026-02-23 20:48:39 [INFO] src.utils: Confusion matrix saved → logs/confusion_matrix.png
+2026-02-23 20:48:40 [INFO] src.utils: Hypnogram saved → logs/hypnogram_sample.png
+2026-02-23 20:48:40 [INFO] __main__: All outputs saved to 'logs/' and 'checkpoints/'
+2026-02-23 20:48:40 [INFO] __main__: Done ✓

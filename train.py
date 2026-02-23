@@ -252,6 +252,8 @@ def main() -> None:
         dense_units=model_cfg.get("dense_units", 128),
         dropout=float(model_cfg.get("dropout", 0.30)),
         learning_rate=float(cfg["training"].get("learning_rate", 1e-3)),
+        focal_gamma=float(model_cfg.get("focal_gamma", 2.0)),
+        class_weights=class_weights,
     )
     print_model_summary(model)
 
@@ -287,7 +289,7 @@ def main() -> None:
         validation_data=val_ds,
         epochs=cfg["training"]["epochs"],
         callbacks=callbacks,
-        class_weight=class_weights,
+        # class_weight is already baked into focal loss; no need to pass again
         verbose=1,
     )
     train_time = time.time() - t_train
@@ -296,7 +298,11 @@ def main() -> None:
     # ── Load best checkpoint ───────────────────────────────────
     best_path = str(Path(ckpt_dir) / "best_model.keras")
     if Path(best_path).exists():
-        model = tf.keras.models.load_model(best_path)
+        from src.model import SparseFocalLoss
+        model = tf.keras.models.load_model(
+            best_path,
+            custom_objects={"SparseFocalLoss": SparseFocalLoss},
+        )
         logger.info("Loaded best checkpoint: %s", best_path)
 
     # ── Evaluation ─────────────────────────────────────────────

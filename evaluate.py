@@ -214,7 +214,11 @@ def main() -> None:
         sys.exit(1)
 
     logger.info("Loading model: %s", args.model)
-    model  = tf.keras.models.load_model(args.model)
+    from src.model import SparseFocalLoss
+    model  = tf.keras.models.load_model(
+        args.model,
+        custom_objects={"SparseFocalLoss": SparseFocalLoss},
+    )
     scaler = load_scaler(args.scaler)
 
     # ── Determine data to evaluate ─────────────────────────────

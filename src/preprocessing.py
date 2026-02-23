@@ -33,10 +33,25 @@ logger = logging.getLogger(__name__)
 STAGE_MAP: Dict[str, int] = {"Awake": 0, "Light": 1, "Deep": 2, "REM": 3}
 STAGE_NAMES: List[str] = ["Awake", "Light", "Deep", "REM"]
 
-FEATURE_COLS: List[str] = [
+# Base sensor columns (from CSV)
+BASE_FEATURE_COLS: List[str] = [
     "HR", "RMSSD", "HR_Stability", "SpO2", "Resp_Rate",
     "Apnea_Event", "SVM", "Body_Temp", "Ambient_Temp", "Humidity", "Light_Lux",
 ]
+
+# Engineered temporal columns (added during loading)
+DELTA_COLS: List[str] = [
+    "HR_delta", "RMSSD_delta", "SpO2_delta",
+    "Resp_Rate_delta", "SVM_delta", "Body_Temp_delta",
+]
+ROLLING_COLS: List[str] = [
+    "HR_roll5_mean", "HR_roll5_std",
+    "RMSSD_roll5_mean", "RMSSD_roll5_std",
+    "SpO2_roll5_mean",
+]
+
+# Full feature set used by the model
+FEATURE_COLS: List[str] = BASE_FEATURE_COLS + DELTA_COLS + ROLLING_COLS
 
 
 # ────────────────────────────────────────────────────────────────
@@ -69,8 +84,33 @@ def _smooth(signal: np.ndarray, kernel: int = 3) -> np.ndarray:
 # Data loading
 # ────────────────────────────────────────────────────────────────
 
+def _add_temporal_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Add per-user-day delta and rolling features for richer temporal context."""
+    delta_sources = ["HR", "RMSSD", "SpO2", "Resp_Rate", "SVM", "Body_Temp"]
+    roll_sources  = [("HR", True), ("RMSSD", True), ("SpO2", False)]  # (col, add_std)
+
+    # Pre-create columns with 0.0 to avoid fragmentation
+    for col in delta_sources:
+        df[f"{col}_delta"] = 0.0
+    for col, add_std in roll_sources:
+        df[f"{col}_roll5_mean"] = 0.0
+        if add_std:
+            df[f"{col}_roll5_std"] = 0.0
+
+    for _, grp in df.groupby(["User_ID", "Day"], sort=False):
+        idx = grp.index
+        for col in delta_sources:
+            df.loc[idx, f"{col}_delta"] = grp[col].diff().fillna(0.0).values
+        for col, add_std in roll_sources:
+            rm = grp[col].rolling(5, min_periods=1)
+            df.loc[idx, f"{col}_roll5_mean"] = rm.mean().values
+            if add_std:
+                df.loc[idx, f"{col}_roll5_std"] = rm.std().fillna(0.0).values
+    return df
+
+
 def load_raw(path: str) -> pd.DataFrame:
-    """Load CSV, coerce types, encode stage label, sort by user/day/time."""
+    """Load CSV, coerce types, encode stage label, add temporal features."""
     logger.info("Loading dataset from %s …", path)
     df = pd.read_csv(path, parse_dates=["Timestamp"])
     df.sort_values(["User_ID", "Day", "Timestamp"], inplace=True)
@@ -83,6 +123,9 @@ def load_raw(path: str) -> pd.DataFrame:
     for col in ["Ambient_Temp", "Humidity", "Light_Lux"]:
         if col in df.columns:
             df[col] = _smooth(df[col].values, kernel=3)
+
+    # Temporal feature engineering — deltas & rolling stats
+    df = _add_temporal_features(df)
 
     logger.info("Dataset loaded: %d rows × %d cols | stages: %s",
                 *df.shape, df["Stage"].value_counts().to_dict())
@@ -121,6 +164,9 @@ def _window_user_day(
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Segment a single user-day group into overlapping windows.
+    Uses CENTER-OF-WINDOW label instead of majority vote.
+    This preserves minority stages (REM/Deep) that get outvoted
+    by the dominant Light class at transition boundaries.
     Returns (X [N, W, F], y [N]) or empty arrays.
     """
     feats = group[feature_cols].values.astype(np.float32)   # [T, F]
@@ -131,14 +177,13 @@ def _window_user_day(
         return np.empty((0, window_size, len(feature_cols)), dtype=np.float32), \
                np.empty(0, dtype=np.int8)
 
+    center_offset = window_size // 2
     windows_X, windows_y = [], []
     for start in range(0, T - window_size + 1, stride):
         end = start + window_size
         windows_X.append(feats[start:end])
-        # Majority vote label for the window
-        wind_labels = labels[start:end]
-        majority = int(np.bincount(wind_labels.astype(np.intp)).argmax())
-        windows_y.append(majority)
+        # Center-of-window label — preserves minority stages
+        windows_y.append(int(labels[start + center_offset]))
 
     X = np.stack(windows_X, axis=0)   # [N, W, F]
     y = np.array(windows_y, dtype=np.int8)
@@ -218,11 +263,57 @@ def user_split(
 # Class weights
 # ────────────────────────────────────────────────────────────────
 
-def get_class_weights(y: np.ndarray) -> Dict[int, float]:
-    """Compute balanced class weights for imbalanced sleep stages."""
+def get_class_weights(y: np.ndarray, boost_minority: float = 1.5) -> Dict[int, float]:
+    """Compute balanced class weights with extra boost for minority stages.
+
+    The standard 'balanced' weights are often insufficient for highly
+    skewed distributions. We apply an additional multiplier to classes
+    whose weight exceeds 1.0 (i.e., under-represented classes).
+    """
     classes = np.unique(y)
     weights = compute_class_weight("balanced", classes=classes, y=y)
-    return {int(c): float(w) for c, w in zip(classes, weights)}
+    cw = {}
+    for c, w in zip(classes, weights):
+        # Boost minority classes (weight > 1 means under-represented)
+        if w > 1.0:
+            w *= boost_minority
+        cw[int(c)] = float(w)
+    return cw
+
+
+def oversample_minority_windows(
+    X: np.ndarray, y: np.ndarray, target_ratio: float = 0.6,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Duplicate minority-class windows to reduce class skew.
+
+    target_ratio: minority classes are oversampled until they reach
+                  this fraction of the majority class count.
+    """
+    classes, counts = np.unique(y, return_counts=True)
+    max_count = counts.max()
+    target = int(max_count * target_ratio)
+
+    extra_X, extra_y = [], []
+    for cls, cnt in zip(classes, counts):
+        if cnt < target:
+            cls_mask = y == cls
+            cls_X = X[cls_mask]
+            cls_y = y[cls_mask]
+            n_needed = target - cnt
+            rng = np.random.default_rng(42)
+            idxs = rng.choice(cnt, size=n_needed, replace=True)
+            extra_X.append(cls_X[idxs])
+            extra_y.append(cls_y[idxs])
+
+    if extra_X:
+        X = np.concatenate([X] + extra_X, axis=0)
+        y = np.concatenate([y] + extra_y, axis=0)
+        # Shuffle
+        perm = np.random.default_rng(42).permutation(len(X))
+        X, y = X[perm], y[perm]
+        logger.info("Oversampled minorities → X=%s  y distribution: %s",
+                    X.shape, dict(zip(*np.unique(y, return_counts=True))))
+    return X, y
 
 
 # ────────────────────────────────────────────────────────────────
@@ -257,7 +348,10 @@ def full_pipeline(
     X_val,   y_val   = create_windows(df_val,   window_size, stride, feature_cols, n_jobs)
     X_test,  y_test  = create_windows(df_test,  window_size, stride, feature_cols, n_jobs)
 
-    cw = get_class_weights(y_train)
+    # Oversample minority classes in training set to reduce skew
+    X_train, y_train = oversample_minority_windows(X_train, y_train, target_ratio=0.6)
+
+    cw = get_class_weights(y_train, boost_minority=1.5)
     logger.info("Class weights: %s", cw)
 
     return dict(

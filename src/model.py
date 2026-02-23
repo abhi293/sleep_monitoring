@@ -57,6 +57,52 @@ from tensorflow.keras.regularizers import l2
 
 
 # ────────────────────────────────────────────────────────────────
+# Focal Loss — critical for class-imbalanced sleep stage detection
+# ────────────────────────────────────────────────────────────────
+
+class SparseFocalLoss(tf.keras.losses.Loss):
+    """Sparse focal loss for multi-class classification.
+
+    Focal loss down-weights easy examples and focuses training on
+    hard-to-classify minority classes (REM, Deep).
+    FL(p_t) = -alpha_t * (1 - p_t)^gamma * log(p_t)
+    """
+
+    def __init__(self, gamma: float = 2.0, class_weights: dict | None = None,
+                 name: str = "sparse_focal_loss", **kwargs):
+        super().__init__(name=name, **kwargs)
+        self.gamma = gamma
+        self.class_weights = class_weights  # {0: w0, 1: w1, ...}
+
+    def call(self, y_true, y_pred):
+        y_pred = tf.clip_by_value(y_pred, 1e-7, 1.0 - 1e-7)
+        y_true = tf.cast(tf.squeeze(y_true), tf.int32)
+        num_classes = tf.shape(y_pred)[-1]
+        y_one_hot = tf.one_hot(y_true, num_classes)
+
+        p_t = tf.reduce_sum(y_one_hot * y_pred, axis=-1)
+        focal_weight = tf.pow(1.0 - p_t, self.gamma)
+        ce = -tf.reduce_sum(y_one_hot * tf.math.log(y_pred), axis=-1)
+
+        loss = focal_weight * ce
+
+        # Apply per-class alpha weights
+        if self.class_weights is not None:
+            n_classes = len(self.class_weights)
+            alpha = tf.constant([self.class_weights.get(i, 1.0)
+                                 for i in range(n_classes)], dtype=tf.float32)
+            alpha_t = tf.reduce_sum(y_one_hot * alpha, axis=-1)
+            loss = alpha_t * loss
+
+        return tf.reduce_mean(loss)
+
+    def get_config(self):
+        config = super().get_config()
+        config.update({"gamma": self.gamma})
+        return config
+
+
+# ────────────────────────────────────────────────────────────────
 # Building blocks
 # ────────────────────────────────────────────────────────────────
 
@@ -85,13 +131,27 @@ def _residual_conv_block(x: tf.Tensor, filters: int, kernel: int,
     return Add()([x, shortcut])
 
 
+def _squeeze_excite(x: tf.Tensor, ratio: int = 4) -> tf.Tensor:
+    """Squeeze-and-Excitation channel attention block.
+
+    Learns to re-weight feature channels — helps the model attend to
+    the most discriminative signals for each sleep stage.
+    """
+    filters = x.shape[-1]
+    se = GlobalAveragePooling1D()(x)                       # [B, C]
+    se = Dense(max(filters // ratio, 4), activation="relu")(se)
+    se = Dense(filters, activation="sigmoid")(se)           # [B, C]
+    se = Reshape((1, filters))(se)                          # [B, 1, C]
+    return x * se                                           # broadcast multiply
+
+
 # ────────────────────────────────────────────────────────────────
 # Main model builder
 # ────────────────────────────────────────────────────────────────
 
 def build_model(
     window_size: int = 30,
-    n_features: int = 11,
+    n_features: int = 22,
     num_classes: int = 4,
     cnn_filters_1: int = 64,
     cnn_filters_2: int = 128,
@@ -104,6 +164,8 @@ def build_model(
     dropout: float = 0.30,
     learning_rate: float = 1e-3,
     l2_reg: float = 1e-4,
+    focal_gamma: float = 2.0,
+    class_weights: dict | None = None,
 ) -> Model:
     """
     Build and compile the Hybrid CNN–GRU–LSTM model.
@@ -124,8 +186,10 @@ def build_model(
     # ── CNN encoder ────────────────────────────────────────────
     cnn = _conv_block(inp, cnn_filters_1, cnn_kernel_1, pool=False, l2_reg=l2_reg)
     cnn = _residual_conv_block(cnn, cnn_filters_1, cnn_kernel_1, l2_reg=l2_reg)
+    cnn = _squeeze_excite(cnn)      # channel attention after first residual
     cnn = _conv_block(cnn, cnn_filters_2, cnn_kernel_2, pool=True,  l2_reg=l2_reg)
     cnn = _residual_conv_block(cnn, cnn_filters_2, cnn_kernel_2, l2_reg=l2_reg)
+    cnn = _squeeze_excite(cnn)      # channel attention after second residual
     # cnn → [batch, T//2, cnn_filters_2]
 
     # ── GRU branch (short-term disturbances) ───────────────────
@@ -168,9 +232,13 @@ def build_model(
     model = Model(inputs=inp, outputs=output, name="SleepNet_CNN_GRU_LSTM")
 
     optimizer = Adam(learning_rate=learning_rate, clipnorm=1.0)
+
+    # Use focal loss to handle class imbalance (critical for REM/Deep)
+    loss_fn = SparseFocalLoss(gamma=focal_gamma, class_weights=class_weights)
+
     model.compile(
         optimizer=optimizer,
-        loss="sparse_categorical_crossentropy",
+        loss=loss_fn,
         metrics=["accuracy"],
     )
     return model
@@ -180,7 +248,8 @@ def build_model(
 # Model from config dict (for MOPSO trial flexibility)
 # ────────────────────────────────────────────────────────────────
 
-def build_from_config(cfg: dict, window_size: int, n_features: int) -> Model:
+def build_from_config(cfg: dict, window_size: int, n_features: int,
+                      class_weights: dict | None = None) -> Model:
     """Convenience wrapper used by the MOPSO fitness evaluator."""
     return build_model(
         window_size=window_size,
@@ -195,6 +264,7 @@ def build_from_config(cfg: dict, window_size: int, n_features: int) -> Model:
         dense_units=int(cfg.get("dense_units", 128)),
         dropout=float(cfg.get("dropout", 0.30)),
         learning_rate=float(cfg.get("learning_rate", 1e-3)),
+        class_weights=class_weights,
     )
 
 

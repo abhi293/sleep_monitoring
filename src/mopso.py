@@ -118,8 +118,8 @@ def _update_archive(archive: List[dict], candidate: dict) -> List[dict]:
 def _evaluate_candidate(
     hyperparams: Dict[str, Any],
     data: dict,
-    quick_epochs: int = 5,
-    n_features: int = 11,
+    quick_epochs: int = 3,
+    n_features: int = 22,
 ) -> Tuple[float, float, float]:
     """
     Train a small model with the given hyperparams for quick_epochs and return
@@ -157,21 +157,21 @@ def _evaluate_candidate(
         return 1.0, 1.0, 6.0
 
     cfg = {**hyperparams, "num_classes": 4}
-    model = build_from_config(cfg, window_size, n_features)
+    model = build_from_config(cfg, window_size, n_features,
+                              class_weights=data.get("class_weights"))
 
-    # Sub-sample for speed during MOPSO fitness calls
-    max_tr = min(len(X_tr), 8000)
+    # Sub-sample aggressively for speed during MOPSO fitness calls
+    max_tr = min(len(X_tr), 4000)
     idx_tr = np.random.choice(len(X_tr), max_tr, replace=False)
-    max_va = min(len(X_va), 2000)
+    max_va = min(len(X_va), 1000)
     idx_va = np.random.choice(len(X_va), max_va, replace=False)
 
     model.fit(
         X_tr[idx_tr], y_tr[idx_tr],
         validation_data=(X_va[idx_va], y_va[idx_va]),
         epochs=quick_epochs,
-        batch_size=128,
+        batch_size=256,
         verbose=0,
-        class_weight=data.get("class_weights"),
     )
 
     loss, acc = model.evaluate(X_va[idx_va], y_va[idx_va], verbose=0)
@@ -218,10 +218,10 @@ class MOPSO:
 
     def __init__(
         self,
-        n_particles: int = 20,
-        max_iter: int = 30,
+        n_particles: int = 10,
+        max_iter: int = 15,
         n_jobs: int = 4,
-        quick_epochs: int = 5,
+        quick_epochs: int = 3,
         pareto_dir: str = "mopso_results",
         w: float = 0.5,
         c1: float = 1.5,
@@ -338,12 +338,16 @@ class MOPSO:
                 guide = self._select_guide()
                 p = self._update_particle(p, guide)
 
-            # Log
+            # Log with ETA
             best_acc = min(s["objectives"][0] for s in self.pareto_archive)
+            elapsed = time.time() - t0
+            avg_per_iter = elapsed / (iteration + 1)
+            eta = avg_per_iter * (self.max_iter - iteration - 1)
             logger.info(
-                "MOPSO iter %02d/%02d | archive=%d | best_1-acc=%.4f | %.1fs",
+                "MOPSO iter %02d/%02d | archive=%d | best_1-acc=%.4f | "
+                "%.1fs/iter | ETA %.0fs",
                 iteration + 1, self.max_iter, len(self.pareto_archive),
-                best_acc, time.time() - t_iter,
+                best_acc, time.time() - t_iter, eta,
             )
             self.history.append({
                 "iteration": iteration + 1,
