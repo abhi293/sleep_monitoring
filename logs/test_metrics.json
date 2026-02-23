@@ -1,0 +1,79 @@
+{
+  "accuracy": 0.702,
+  "kappa": 0.4665196313614849,
+  "per_class": {
+    "Awake": {
+      "precision": 0.8666666666666667,
+      "recall": 0.8666666666666667,
+      "f1-score": 0.8666666666666667,
+      "support": 75.0
+    },
+    "Light": {
+      "precision": 0.6739130434782609,
+      "recall": 0.9117647058823529,
+      "f1-score": 0.775,
+      "support": 272.0
+    },
+    "Deep": {
+      "precision": 0.6792452830188679,
+      "recall": 0.43902439024390244,
+      "f1-score": 0.5333333333333333,
+      "support": 82.0
+    },
+    "REM": {
+      "precision": 0.5,
+      "recall": 0.028169014084507043,
+      "f1-score": 0.05333333333333334,
+      "support": 71.0
+    },
+    "accuracy": 0.702,
+    "macro avg": {
+      "precision": 0.6799562482909488,
+      "recall": 0.5614061942193572,
+      "f1-score": 0.5570833333333333,
+      "support": 500.0
+    },
+    "weighted avg": {
+      "precision": 0.6790049220672683,
+      "recall": 0.702,
+      "f1-score": 0.6466400000000001,
+      "support": 500.0
+    }
+  },
+  "false_alarm_rate_per_class": {
+    "Awake": 0.023529411764705882,
+    "Light": 0.5263157894736842,
+    "Deep": 0.04066985645933014,
+    "REM": 0.004662004662004662
+  },
+  "mean_false_alarm_rate": 0.14879426558993122,
+  "sleep_efficiency": 0.85,
+  "confusion_matrix": [
+    [
+      65,
+      10,
+      0,
+      0
+    ],
+    [
+      9,
+      248,
+      13,
+      2
+    ],
+    [
+      0,
+      46,
+      36,
+      0
+    ],
+    [
+      1,
+      64,
+      4,
+      2
+    ]
+  ],
+  "training_time_sec": 11.23,
+  "sleep_quality_score": 69.51
+}

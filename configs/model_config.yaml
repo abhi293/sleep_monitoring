@@ -1,0 +1,77 @@
+# ─────────────────────────────────────────────────────────────
+# Sleep Intelligence System — Model & Training Configuration
+# ─────────────────────────────────────────────────────────────
+
+data:
+  dataset_path: "realistic_sleep_dataset_v4.csv"
+  feature_cols:
+    - HR
+    - RMSSD
+    - HR_Stability
+    - SpO2
+    - Resp_Rate
+    - Apnea_Event
+    - SVM
+    - Body_Temp
+    - Ambient_Temp
+    - Humidity
+    - Light_Lux
+  label_col: Stage
+  stage_map:
+    Awake: 0
+    Light: 1
+    Deep:  2
+    REM:   3
+  # Windowing
+  window_size: 30         # timesteps per sample (30 min)
+  stride: 10              # stride between windows
+  # Train/val/test split (by user ID)
+  val_ratio:  0.15
+  test_ratio: 0.15
+  random_seed: 42
+
+model:
+  # CNN branch
+  cnn_filters_1: 64
+  cnn_filters_2: 128
+  cnn_kernel_1: 3
+  cnn_kernel_2: 3
+  cnn_pool_size: 2
+  # GRU branch
+  gru_units: 64
+  gru_return_seq: true
+  # LSTM branch
+  lstm_units: 64
+  # Shared head
+  dense_units: 128
+  dropout: 0.30
+  num_classes: 4
+
+training:
+  epochs: 50
+  batch_size: 256
+  learning_rate: 0.001
+  lr_schedule: cosine       # cosine | reduce_on_plateau | none
+  early_stopping_patience: 8
+  class_weights: true        # compensate class imbalance
+  num_workers: 4             # CPU cores for data loading
+  mixed_precision: false     # no GPU → keep float32
+  checkpoint_dir: "checkpoints"
+  log_dir: "logs"
+
+mopso:
+  n_particles: 20
+  max_iter: 30
+  n_jobs: 4                  # parallel fitness evaluations
+  # Objectives: accuracy, false_alarm_rate, param_count
+  objectives: [accuracy, false_alarm_rate, param_count]
+  search_space:
+    cnn_filters_1:  [32, 64, 128]
+    cnn_filters_2:  [64, 128, 256]
+    gru_units:      [32, 64, 128]
+    lstm_units:     [32, 64, 128]
+    dense_units:    [64, 128, 256]
+    dropout:        [0.1, 0.5]
+    learning_rate:  [0.0001, 0.01]
+    window_size:    [20, 30, 40]
+  pareto_dir: "mopso_results"

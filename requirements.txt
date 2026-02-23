@@ -1,0 +1,28 @@
+# Sleep Intelligence System — Python Dependencies
+# ─────────────────────────────────────────────────────
+# Install with:  pip install -r requirements.txt
+
+# Core numerical & data
+numpy>=1.24
+pandas>=2.0
+scipy>=1.11
+
+# Machine learning
+scikit-learn>=1.3
+tensorflow>=2.13          # CPU-only build is fine; no GPU required
+
+# Optimisation
+pymoo>=0.6                # multi-objective algorithms (NSGA-II reference etc.)
+pyswarms>=1.3             # single-objective PSO (used for comparison / debugging)
+
+# Signal processing
+PyWavelets>=1.4           # wavelet features (future extension)
+
+# Plotting & visualisation
+matplotlib>=3.7
+seaborn>=0.12
+
+# Utilities
+joblib>=1.3               # parallel preprocessing workers
+tqdm>=4.65                # progress bars
+pyyaml>=6.0               # YAML config loading
