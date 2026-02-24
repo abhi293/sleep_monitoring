@@ -252,7 +252,7 @@ def user_split(
     df_val   = df[df["User_ID"].isin(val_users)].copy()
     df_test  = df[df["User_ID"].isin(test_users)].copy()
 
-    logger.info("Split → train %d users (%d rows) | val %d users (%d rows) | test %d users (%d rows)",
+    logger.info("Split -> train %d users (%d rows) | val %d users (%d rows) | test %d users (%d rows)",
                 len(train_users), len(df_train),
                 len(val_users),   len(df_val),
                 len(test_users),  len(df_test))
@@ -311,7 +311,7 @@ def oversample_minority_windows(
         # Shuffle
         perm = np.random.default_rng(42).permutation(len(X))
         X, y = X[perm], y[perm]
-        logger.info("Oversampled minorities → X=%s  y distribution: %s",
+        logger.info("Oversampled minorities -> X=%s  y distribution: %s",
                     X.shape, dict(zip(*np.unique(y, return_counts=True))))
     return X, y
 

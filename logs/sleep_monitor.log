@@ -357,3 +357,347 @@
 2026-02-23 22:29:39 [INFO] src.mopso: MOPSO iter 06/10 | archive=7 | best_1-acc=0.3867 | 169.6s/iter | ETA 620s
 2026-02-23 22:32:38 [INFO] src.mopso: MOPSO iter 07/10 | archive=9 | best_1-acc=0.3867 | 179.0s/iter | ETA 475s
 2026-02-23 22:35:44 [INFO] src.mopso: MOPSO iter 08/10 | archive=11 | best_1-acc=0.3567 | 185.5s/iter | ETA 324s
+2026-02-24 04:20:58 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-02-24 04:20:58 [INFO] __main__:   Sleep Intelligence System — Training
+2026-02-24 04:20:58 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-02-24 04:20:58 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-02-24 04:21:03 [INFO] __main__: Stage 2/4 — MOPSO hyperparameter optimisation …
+2026-02-24 04:21:05 [INFO] src.mopso: Starting MOPSO: 10 particles × 10 iterations on 1 workers
+2026-02-24 04:21:19 [WARNING] tensorflow: From D:\Projects\Sleep\venv\Lib\site-packages\keras\src\backend\common\global_state.py:82: The name tf.reset_default_graph is deprecated. Please use tf.compat.v1.reset_default_graph instead.
+
+2026-02-24 04:23:36 [INFO] src.mopso: MOPSO iter 01/10 | archive=3 | best_1-acc=0.4133 | 151.3s/iter | ETA 1362s
+2026-02-24 04:26:12 [INFO] src.mopso: MOPSO iter 02/10 | archive=6 | best_1-acc=0.4133 | 155.7s/iter | ETA 1228s
+2026-02-24 04:28:52 [INFO] src.mopso: MOPSO iter 03/10 | archive=8 | best_1-acc=0.4133 | 159.6s/iter | ETA 1089s
+2026-02-24 04:31:39 [INFO] src.mopso: MOPSO iter 04/10 | archive=8 | best_1-acc=0.4133 | 167.6s/iter | ETA 951s
+2026-02-24 04:34:41 [INFO] src.mopso: MOPSO iter 05/10 | archive=9 | best_1-acc=0.4133 | 181.5s/iter | ETA 816s
+2026-02-24 04:37:47 [INFO] src.mopso: MOPSO iter 06/10 | archive=10 | best_1-acc=0.4133 | 186.4s/iter | ETA 668s
+2026-02-24 04:40:58 [INFO] src.mopso: MOPSO iter 07/10 | archive=12 | best_1-acc=0.4133 | 191.1s/iter | ETA 511s
+2026-02-24 04:44:50 [INFO] src.mopso: MOPSO iter 08/10 | archive=11 | best_1-acc=0.4133 | 232.2s/iter | ETA 356s
+2026-02-24 04:48:15 [INFO] src.mopso: MOPSO iter 09/10 | archive=9 | best_1-acc=0.4133 | 204.6s/iter | ETA 181s
+2026-02-24 04:51:43 [INFO] src.mopso: MOPSO iter 10/10 | archive=9 | best_1-acc=0.4133 | 207.7s/iter | ETA 0s
+2026-02-24 04:51:43 [INFO] src.mopso: MOPSO finished in 1837.8s | Pareto archive: 9 solutions
+2026-02-24 04:52:31 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-02-24 04:52:31 [INFO] __main__:   Sleep Intelligence System — Training
+2026-02-24 04:52:31 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-02-24 04:52:31 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-02-24 04:52:38 [INFO] __main__: Stage 2/4 — MOPSO hyperparameter optimisation …
+2026-02-24 04:52:41 [INFO] src.mopso: Starting MOPSO: 10 particles × 10 iterations on 1 workers
+2026-02-24 04:58:25 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-02-24 04:58:25 [INFO] __main__: ============================================================
+2026-02-24 04:58:25 [INFO] __main__:   Sleep Intelligence System -- Training
+2026-02-24 04:58:25 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-02-24 04:58:25 [INFO] __main__: ============================================================
+2026-02-24 04:58:25 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-02-24 04:58:32 [INFO] src.utils: Scaler saved -> checkpoints\scaler.pkl
+2026-02-24 04:58:32 [INFO] __main__: Data ready -> train: (17790, 30, 22) | val: (2089, 30, 22) | test: (2205, 30, 22)  (7.7s)
+2026-02-24 04:58:32 [INFO] __main__: Stage 2/4 — MOPSO hyperparameter optimisation …
+2026-02-24 04:58:35 [INFO] src.mopso: Starting MOPSO: 10 particles × 10 iterations on 1 workers
+2026-02-24 04:58:55 [WARNING] tensorflow: From D:\Projects\Sleep\venv\Lib\site-packages\keras\src\backend\common\global_state.py:82: The name tf.reset_default_graph is deprecated. Please use tf.compat.v1.reset_default_graph instead.
+
+2026-02-24 05:01:29 [INFO] src.mopso: MOPSO iter 01/10 | archive=7 | best_1-acc=0.4567 | 173.4s/iter | ETA 1561s
+2026-02-24 05:04:09 [INFO] src.mopso: MOPSO iter 02/10 | archive=9 | best_1-acc=0.4567 | 160.2s/iter | ETA 1335s
+2026-02-24 05:06:51 [INFO] src.mopso: MOPSO iter 03/10 | archive=9 | best_1-acc=0.4567 | 162.3s/iter | ETA 1157s
+2026-02-24 05:09:41 [INFO] src.mopso: MOPSO iter 04/10 | archive=5 | best_1-acc=0.4533 | 169.4s/iter | ETA 998s
+2026-02-24 05:12:35 [INFO] src.mopso: MOPSO iter 05/10 | archive=5 | best_1-acc=0.4233 | 174.0s/iter | ETA 839s
+2026-02-24 05:15:37 [INFO] src.mopso: MOPSO iter 06/10 | archive=5 | best_1-acc=0.4233 | 182.8s/iter | ETA 681s
+2026-02-24 05:18:45 [INFO] src.mopso: MOPSO iter 07/10 | archive=6 | best_1-acc=0.4233 | 187.2s/iter | ETA 518s
+2026-02-24 05:22:12 [INFO] src.mopso: MOPSO iter 08/10 | archive=6 | best_1-acc=0.4233 | 207.3s/iter | ETA 354s
+2026-02-24 05:25:23 [INFO] src.mopso: MOPSO iter 09/10 | archive=7 | best_1-acc=0.4200 | 191.5s/iter | ETA 179s
+2026-02-24 05:28:55 [INFO] src.mopso: MOPSO iter 10/10 | archive=7 | best_1-acc=0.4200 | 211.7s/iter | ETA 0s
+2026-02-24 05:28:55 [INFO] src.mopso: MOPSO finished in 1819.8s | Pareto archive: 7 solutions
+2026-02-24 05:28:55 [INFO] src.mopso: MOPSO results saved -> mopso_results\mopso_results.json
+2026-02-24 05:28:55 [INFO] src.mopso: Selected hyperparams [balanced]: {'cnn_filters_1': 64, 'cnn_filters_2': 128, 'gru_units': 64, 'lstm_units': 32, 'dense_units': 128, 'dropout': 0.1, 'learning_rate': 0.000582208925032423, 'window_size': 30} | objectives: [0.4233333468437195, 0.02857142857142857, 5.518308588490471]
+2026-02-24 05:28:56 [INFO] src.utils: Plot saved -> mopso_results\pareto_front.png
+2026-02-24 05:28:56 [INFO] __main__: MOPSO best config: {'cnn_filters_1': 64, 'cnn_filters_2': 128, 'cnn_kernel_1': 3, 'cnn_kernel_2': 3, 'cnn_pool_size': 2, 'gru_units': 64, 'gru_return_seq': True, 'lstm_units': 32, 'dense_units': 128, 'dropout': 0.1, 'num_classes': 4, 'focal_gamma': 2.0}
+2026-02-24 05:28:56 [INFO] __main__: Stage 3/4 — Building model …
+2026-02-24 05:28:56 [INFO] __main__: Stage 4/4 — Training …
+2026-02-24 05:31:02 [INFO] __main__: Training completed in 126.0s
+2026-02-24 05:31:03 [INFO] __main__: Loaded best checkpoint: checkpoints\best_model.keras
+2026-02-24 05:31:03 [INFO] __main__: Evaluating on test set …
+2026-02-24 05:31:06 [INFO] __main__: ============================================================
+2026-02-24 05:31:06 [INFO] __main__:   TEST RESULTS
+2026-02-24 05:31:06 [INFO] __main__:   Accuracy        : 0.8812
+2026-02-24 05:31:06 [INFO] __main__:   Cohen's Kappa   : 0.8222
+2026-02-24 05:31:06 [INFO] __main__:   Mean FAR        : 0.0396
+2026-02-24 05:31:06 [INFO] __main__:   Sleep Efficiency: 0.8213
+2026-02-24 05:31:06 [INFO] __main__:   Sleep Quality ^ : 86.63 / 100
+2026-02-24 05:31:06 [INFO] __main__: ============================================================
+2026-02-24 05:31:06 [INFO] __main__:   Awake  -> P=0.957 R=0.972 F1=0.964  FAR=0.009
+2026-02-24 05:31:06 [INFO] __main__:   Light  -> P=0.958 R=0.860 F1=0.906  FAR=0.042
+2026-02-24 05:31:06 [INFO] __main__:   Deep   -> P=0.817 R=0.968 F1=0.886  FAR=0.040
+2026-02-24 05:31:06 [INFO] __main__:   REM    -> P=0.651 R=0.751 F1=0.697  FAR=0.067
+2026-02-24 05:31:06 [INFO] src.utils: Metrics saved -> logs\test_metrics.json
+2026-02-24 05:31:06 [INFO] src.utils: Plot saved -> logs\class_distribution_train.png
+2026-02-24 05:31:06 [INFO] src.utils: Generating comprehensive plot suite -> logs/
+2026-02-24 05:31:08 [INFO] src.utils: Plot saved -> logs/training_curves.png
+2026-02-24 05:31:09 [INFO] src.utils: Plot saved -> logs/confusion_matrix.png
+2026-02-24 05:31:10 [INFO] src.utils: Plot saved -> logs/confusion_matrix_counts.png
+2026-02-24 05:31:12 [INFO] src.utils: Plot saved -> logs/hypnogram_predicted.png
+2026-02-24 05:31:14 [INFO] src.utils: Plot saved -> logs/hypnogram_comparison.png
+2026-02-24 05:31:14 [INFO] src.utils: Plot saved -> logs/per_class_metrics.png
+2026-02-24 05:31:14 [INFO] src.utils: Plot saved -> logs/false_alarm_rates.png
+2026-02-24 05:31:15 [INFO] src.utils: Plot saved -> logs/metrics_radar.png
+2026-02-24 05:31:15 [INFO] src.utils: Plot saved -> logs/metrics_summary_table.png
+2026-02-24 05:31:16 [INFO] src.utils: Plot saved -> logs/roc_curves.png
+2026-02-24 05:31:16 [INFO] src.utils: Plot saved -> logs/confidence_distribution.png
+2026-02-24 05:31:17 [INFO] src.utils: Plot saved -> logs/stage_probabilities.png
+2026-02-24 05:31:17 [INFO] src.utils: Plot saved -> logs/class_distribution_true.png
+2026-02-24 05:31:18 [INFO] src.utils: Plot saved -> logs/class_distribution_pred.png
+2026-02-24 05:31:18 [INFO] src.utils: Plot saved -> logs/transition_matrix_pred.png
+2026-02-24 05:31:19 [INFO] src.utils: Plot saved -> logs/transition_matrix_true.png
+2026-02-24 05:31:26 [INFO] src.utils: Plot saved -> logs/feature_correlation.png
+2026-02-24 05:31:26 [INFO] src.utils: Plot saved -> logs/sleep_quality_gauge.png
+2026-02-24 05:31:29 [INFO] src.utils: Plot saved -> logs/dashboard.png
+2026-02-24 05:31:29 [INFO] src.utils: All 21 plots saved to logs/
+2026-02-24 05:31:29 [INFO] __main__: All outputs saved to 'logs/' and 'checkpoints/'
+2026-02-24 05:31:29 [INFO] __main__: Done.
+2026-02-24 05:47:19 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-02-24 05:47:19 [INFO] __main__: ============================================================
+2026-02-24 05:47:19 [INFO] __main__:   Sleep Intelligence System -- Training
+2026-02-24 05:47:19 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-02-24 05:47:19 [INFO] __main__: ============================================================
+2026-02-24 05:47:19 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-02-24 05:47:24 [INFO] src.utils: Scaler saved -> checkpoints\scaler.pkl
+2026-02-24 05:47:24 [INFO] __main__: Data ready -> train: (59394, 30, 22) | val: (6894, 30, 22) | test: (7279, 30, 22)  (4.7s)
+2026-02-24 05:47:24 [INFO] __main__: Stage 2/4 — MOPSO hyperparameter optimisation …
+2026-02-24 05:47:26 [INFO] src.mopso: Starting MOPSO: 15 particles × 20 iterations on 4 workers
+2026-02-24 05:51:37 [INFO] src.mopso: MOPSO iter 01/20 | archive=5 | best_1-acc=0.2287 | 251.2s/iter | ETA 4772s
+2026-02-24 05:55:05 [INFO] src.mopso: MOPSO iter 02/20 | archive=3 | best_1-acc=0.2287 | 208.5s/iter | ETA 4137s
+2026-02-24 05:59:03 [INFO] src.mopso: MOPSO iter 03/20 | archive=4 | best_1-acc=0.2047 | 237.3s/iter | ETA 3949s
+2026-02-24 06:02:55 [INFO] src.mopso: MOPSO iter 04/20 | archive=5 | best_1-acc=0.2047 | 232.0s/iter | ETA 3716s
+2026-02-24 06:06:57 [INFO] src.mopso: MOPSO iter 05/20 | archive=5 | best_1-acc=0.2047 | 242.1s/iter | ETA 3513s
+2026-02-24 06:11:05 [INFO] src.mopso: MOPSO iter 06/20 | archive=5 | best_1-acc=0.2047 | 248.3s/iter | ETA 3312s
+2026-02-24 06:15:34 [INFO] src.mopso: MOPSO iter 07/20 | archive=6 | best_1-acc=0.1740 | 268.5s/iter | ETA 3135s
+2026-02-24 06:19:49 [INFO] src.mopso: MOPSO iter 08/20 | archive=8 | best_1-acc=0.1740 | 255.1s/iter | ETA 2914s
+2026-02-24 06:23:51 [INFO] src.mopso: MOPSO iter 09/20 | archive=8 | best_1-acc=0.1740 | 241.9s/iter | ETA 2670s
+2026-02-24 06:28:07 [INFO] src.mopso: MOPSO iter 10/20 | archive=9 | best_1-acc=0.1740 | 256.8s/iter | ETA 2442s
+2026-02-24 06:32:55 [INFO] src.mopso: MOPSO iter 11/20 | archive=9 | best_1-acc=0.1740 | 287.6s/iter | ETA 2233s
+2026-02-24 06:38:57 [INFO] src.mopso: MOPSO iter 12/20 | archive=11 | best_1-acc=0.1740 | 361.5s/iter | ETA 2061s
+2026-02-24 12:24:05 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-02-24 12:24:05 [INFO] __main__: ============================================================
+2026-02-24 12:24:05 [INFO] __main__:   Sleep Intelligence System -- Training
+2026-02-24 12:24:05 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-02-24 12:24:05 [INFO] __main__: ============================================================
+2026-02-24 12:24:05 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-02-24 12:24:13 [INFO] src.utils: Scaler saved -> checkpoints\scaler.pkl
+2026-02-24 12:24:13 [INFO] __main__: Data ready -> train: (59394, 30, 22) | val: (6894, 30, 22) | test: (7279, 30, 22)  (7.8s)
+2026-02-24 12:24:13 [INFO] __main__: Stage 2/4 — MOPSO hyperparameter optimisation …
+2026-02-24 12:24:17 [INFO] src.mopso: Starting MOPSO: 15 particles × 20 iterations on 2 workers
+2026-02-24 12:30:28 [INFO] src.mopso: MOPSO iter 01/20 | archive=5 | best_1-acc=0.2487 | 370.5s/iter | ETA 7040s
+2026-02-24 12:34:00 [INFO] src.mopso: MOPSO iter 02/20 | archive=6 | best_1-acc=0.2100 | 212.0s/iter | ETA 5242s
+2026-02-24 12:38:17 [INFO] src.mopso: MOPSO iter 03/20 | archive=8 | best_1-acc=0.1963 | 256.9s/iter | ETA 4757s
+2026-02-24 12:42:46 [INFO] src.mopso: MOPSO iter 04/20 | archive=12 | best_1-acc=0.1963 | 269.5s/iter | ETA 4436s
+2026-02-24 12:47:22 [INFO] src.mopso: MOPSO iter 05/20 | archive=15 | best_1-acc=0.1963 | 275.6s/iter | ETA 4154s
+2026-02-24 12:52:46 [INFO] src.mopso: MOPSO iter 06/20 | archive=11 | best_1-acc=0.1963 | 324.3s/iter | ETA 3987s
+2026-02-24 12:59:43 [INFO] src.mopso: MOPSO iter 07/20 | archive=13 | best_1-acc=0.1963 | 416.8s/iter | ETA 3948s
+2026-02-24 13:10:10 [INFO] src.mopso: MOPSO iter 08/20 | archive=13 | best_1-acc=0.1963 | 626.7s/iter | ETA 4129s
+2026-02-24 13:26:22 [INFO] src.mopso: MOPSO iter 09/20 | archive=14 | best_1-acc=0.1963 | 972.5s/iter | ETA 4553s
+2026-02-24 13:47:08 [INFO] src.mopso: MOPSO iter 10/20 | archive=13 | best_1-acc=0.1963 | 1246.1s/iter | ETA 4971s
+2026-02-24 13:59:13 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-02-24 13:59:13 [INFO] __main__: ============================================================
+2026-02-24 13:59:13 [INFO] __main__:   Sleep Intelligence System -- Training
+2026-02-24 13:59:13 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-02-24 13:59:13 [INFO] __main__: ============================================================
+2026-02-24 13:59:13 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-02-24 13:59:18 [INFO] src.utils: Scaler saved -> checkpoints\scaler.pkl
+2026-02-24 13:59:18 [INFO] __main__: Data ready -> train: (59394, 30, 22) | val: (6894, 30, 22) | test: (7279, 30, 22)  (5.0s)
+2026-02-24 13:59:18 [INFO] __main__: Stage 2/4 — MOPSO hyperparameter optimisation …
+2026-02-24 13:59:21 [INFO] src.mopso: Starting MOPSO: 15 particles × 10 iterations on 2 workers
+2026-02-24 14:03:50 [INFO] src.mopso: MOPSO iter 01/10 | archive=5 | best_1-acc=0.3388 | 269.2s/iter | ETA 2423s
+2026-02-24 14:10:24 [INFO] src.mopso: MOPSO iter 02/10 | archive=7 | best_1-acc=0.3388 | 394.5s/iter | ETA 2655s
+2026-02-24 14:14:23 [INFO] src.mopso: MOPSO iter 03/10 | archive=10 | best_1-acc=0.2925 | 238.7s/iter | ETA 2106s
+2026-02-24 14:19:09 [INFO] src.mopso: MOPSO iter 04/10 | archive=13 | best_1-acc=0.2925 | 286.1s/iter | ETA 1783s
+2026-02-24 14:24:53 [INFO] src.mopso: MOPSO iter 05/10 | archive=17 | best_1-acc=0.2837 | 343.7s/iter | ETA 1532s
+2026-02-24 14:31:11 [INFO] src.mopso: MOPSO iter 06/10 | archive=16 | best_1-acc=0.2725 | 377.5s/iter | ETA 1273s
+2026-02-24 14:37:05 [INFO] src.mopso: MOPSO iter 07/10 | archive=19 | best_1-acc=0.2725 | 354.1s/iter | ETA 970s
+2026-02-24 14:43:27 [INFO] src.mopso: MOPSO iter 08/10 | archive=17 | best_1-acc=0.2725 | 382.0s/iter | ETA 661s
+2026-02-24 14:50:09 [INFO] src.mopso: MOPSO iter 09/10 | archive=8 | best_1-acc=0.1225 | 402.2s/iter | ETA 339s
+2026-02-24 14:57:12 [INFO] src.mopso: MOPSO iter 10/10 | archive=6 | best_1-acc=0.1225 | 423.0s/iter | ETA 0s
+2026-02-24 14:57:12 [INFO] src.mopso: MOPSO finished in 3471.1s | Pareto archive: 6 solutions
+2026-02-24 14:57:12 [INFO] src.mopso: MOPSO results saved -> mopso_results\mopso_results.json
+2026-02-24 14:57:12 [INFO] src.mopso: Selected hyperparams [balanced]: {'cnn_filters_1': 32, 'cnn_filters_2': 64, 'gru_units': 32, 'lstm_units': 64, 'dense_units': 64, 'dropout': 0.5, 'learning_rate': 0.0010450500402154697, 'window_size': 20} | objectives: [0.2574999928474426, 0.0, 5.166003603146687]
+2026-02-24 14:57:12 [INFO] __main__: Re-windowing with MOPSO-selected window=20
+2026-02-24 14:58:58 [INFO] src.utils: Plot saved -> mopso_results\pareto_front.png
+2026-02-24 14:58:58 [INFO] __main__: MOPSO best config: {'cnn_filters_1': 32, 'cnn_filters_2': 64, 'cnn_kernel_1': 3, 'cnn_kernel_2': 3, 'cnn_pool_size': 2, 'gru_units': 32, 'gru_return_seq': True, 'lstm_units': 64, 'dense_units': 64, 'dropout': 0.5, 'num_classes': 4, 'focal_gamma': 2.0}
+2026-02-24 14:58:58 [INFO] __main__: Merging train+val for final training: 20804 + 3567 = 24371 windows
+2026-02-24 14:58:58 [INFO] __main__: Recomputed class weights on merged set: {0: 2.2956857573474, 1: 0.4810698776154757, 2: 2.1478554641598118, 3: 2.6337536023054757}
+2026-02-24 14:58:58 [INFO] __main__: Stage 3/4 — Building model …
+2026-02-24 14:58:59 [INFO] __main__: Stage 4/4 — Training …
+2026-02-24 16:23:03 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-02-24 16:23:03 [INFO] __main__: ============================================================
+2026-02-24 16:23:03 [INFO] __main__:   Sleep Intelligence System -- Training
+2026-02-24 16:23:03 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-02-24 16:23:03 [INFO] __main__: ============================================================
+2026-02-24 16:23:03 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-02-24 16:23:09 [INFO] src.utils: Scaler saved -> checkpoints\scaler.pkl
+2026-02-24 16:23:09 [INFO] __main__: Data ready -> train: (59394, 30, 22) | val: (6894, 30, 22) | test: (7279, 30, 22)  (5.8s)
+2026-02-24 16:23:09 [INFO] __main__: Stage 2/4 — MOPSO hyperparameter optimisation …
+2026-02-24 16:23:11 [INFO] __main__: Loading existing MOPSO results (--load_mopso) …
+2026-02-24 16:23:11 [INFO] src.mopso: Loaded 6 Pareto solutions from mopso_results\mopso_results.json
+2026-02-24 16:23:11 [INFO] src.mopso: Selected hyperparams [balanced]: {'cnn_filters_1': 32, 'cnn_filters_2': 64, 'gru_units': 32, 'lstm_units': 64, 'dense_units': 64, 'dropout': 0.5, 'learning_rate': 0.0010450500402154697, 'window_size': 20} | objectives: [0.2574999928474426, 0.0, 5.166003603146687]
+2026-02-24 16:23:11 [INFO] __main__: Re-windowing with MOPSO-selected window=20
+2026-02-24 16:23:12 [INFO] src.utils: Plot saved -> mopso_results\pareto_front.png
+2026-02-24 16:23:12 [INFO] __main__: MOPSO best config: {'cnn_filters_1': 32, 'cnn_filters_2': 64, 'cnn_kernel_1': 3, 'cnn_kernel_2': 3, 'cnn_pool_size': 2, 'gru_units': 32, 'gru_return_seq': True, 'lstm_units': 64, 'dense_units': 64, 'dropout': 0.5, 'num_classes': 4, 'focal_gamma': 2.0}
+2026-02-24 16:23:12 [INFO] __main__: Merging train+val for final training: 20804 + 3567 = 24371 windows
+2026-02-24 16:23:12 [INFO] __main__: Recomputed class weights on merged set: {0: 2.2956857573474, 1: 0.4810698776154757, 2: 2.1478554641598118, 3: 2.6337536023054757}
+2026-02-24 16:23:12 [INFO] __main__: Stage 3/4 — Building model …
+2026-02-24 16:23:12 [INFO] __main__: Stage 4/4 — Training …
+2026-02-24 16:25:54 [INFO] __main__: Training completed in 161.8s
+2026-02-24 16:25:55 [INFO] __main__: Loaded best checkpoint: checkpoints\best_model.keras
+2026-02-24 16:25:55 [INFO] __main__: Evaluating on test set …
+2026-02-24 16:25:56 [INFO] __main__: ============================================================
+2026-02-24 16:25:56 [INFO] __main__:   TEST RESULTS
+2026-02-24 16:25:56 [INFO] __main__:   Accuracy        : 0.9539
+2026-02-24 16:25:56 [INFO] __main__:   Cohen's Kappa   : 0.9305
+2026-02-24 16:25:56 [INFO] __main__:   Mean FAR        : 0.0136
+2026-02-24 16:25:56 [INFO] __main__:   Sleep Efficiency: 0.8181
+2026-02-24 16:25:56 [INFO] __main__:   Sleep Quality ^ : 92.58 / 100
+2026-02-24 16:25:56 [INFO] __main__: ============================================================
+2026-02-24 16:25:56 [INFO] __main__:   Awake  -> P=0.996 R=0.999 F1=0.997  FAR=0.001
+2026-02-24 16:25:56 [INFO] __main__:   Light  -> P=0.999 R=0.921 F1=0.958  FAR=0.001
+2026-02-24 16:25:56 [INFO] __main__:   Deep   -> P=0.903 R=0.988 F1=0.944  FAR=0.019
+2026-02-24 16:25:56 [INFO] __main__:   REM    -> P=0.828 R=0.983 F1=0.899  FAR=0.033
+2026-02-24 16:25:56 [INFO] src.utils: Metrics saved -> logs\test_metrics.json
+2026-02-24 16:25:56 [INFO] src.utils: Plot saved -> logs\class_distribution_train.png
+2026-02-24 16:25:56 [INFO] src.utils: Generating comprehensive plot suite -> logs/
+2026-02-24 16:25:57 [INFO] src.utils: Plot saved -> logs/training_curves.png
+2026-02-24 16:25:58 [INFO] src.utils: Plot saved -> logs/confusion_matrix.png
+2026-02-24 16:25:58 [INFO] src.utils: Plot saved -> logs/confusion_matrix_counts.png
+2026-02-24 16:25:59 [INFO] src.utils: Plot saved -> logs/hypnogram_predicted.png
+2026-02-24 16:26:01 [INFO] src.utils: Plot saved -> logs/hypnogram_comparison.png
+2026-02-24 16:26:01 [INFO] src.utils: Plot saved -> logs/per_class_metrics.png
+2026-02-24 16:26:02 [INFO] src.utils: Plot saved -> logs/false_alarm_rates.png
+2026-02-24 16:26:02 [INFO] src.utils: Plot saved -> logs/metrics_radar.png
+2026-02-24 16:26:02 [INFO] src.utils: Plot saved -> logs/metrics_summary_table.png
+2026-02-24 16:26:02 [INFO] src.utils: Plot saved -> logs/roc_curves.png
+2026-02-24 16:26:03 [INFO] src.utils: Plot saved -> logs/confidence_distribution.png
+2026-02-24 16:26:04 [INFO] src.utils: Plot saved -> logs/stage_probabilities.png
+2026-02-24 16:26:04 [INFO] src.utils: Plot saved -> logs/class_distribution_true.png
+2026-02-24 16:26:04 [INFO] src.utils: Plot saved -> logs/class_distribution_pred.png
+2026-02-24 16:26:05 [INFO] src.utils: Plot saved -> logs/transition_matrix_pred.png
+2026-02-24 16:26:05 [INFO] src.utils: Plot saved -> logs/transition_matrix_true.png
+2026-02-24 16:26:09 [INFO] src.utils: Plot saved -> logs/feature_correlation.png
+2026-02-24 16:26:09 [INFO] src.utils: Plot saved -> logs/sleep_quality_gauge.png
+2026-02-24 16:26:11 [INFO] src.utils: Plot saved -> logs/dashboard.png
+2026-02-24 16:26:11 [INFO] src.utils: All 21 plots saved to logs/
+2026-02-24 16:26:11 [INFO] __main__: All outputs saved to 'logs/' and 'checkpoints/'
+2026-02-24 16:26:11 [INFO] __main__: Done.
+2026-02-24 18:39:58 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-02-24 18:39:58 [INFO] __main__: ============================================================
+2026-02-24 18:39:58 [INFO] __main__:   Sleep Intelligence System -- Training
+2026-02-24 18:39:58 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-02-24 18:39:58 [INFO] __main__: ============================================================
+2026-02-24 18:39:58 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-02-24 18:40:03 [INFO] src.utils: Scaler saved -> checkpoints\scaler.pkl
+2026-02-24 18:40:03 [INFO] __main__: Data ready -> train: (59394, 30, 22) | val: (6894, 30, 22) | test: (7279, 30, 22)  (4.6s)
+2026-02-24 18:40:03 [INFO] __main__: Stage 2/4 — MOPSO hyperparameter optimisation …
+2026-02-24 18:40:05 [INFO] __main__: Loading existing MOPSO results (--load_mopso) …
+2026-02-24 18:40:05 [INFO] src.mopso: Loaded 6 Pareto solutions from mopso_results\mopso_results.json
+2026-02-24 18:40:05 [INFO] src.mopso: Selected hyperparams [balanced]: {'cnn_filters_1': 32, 'cnn_filters_2': 64, 'gru_units': 32, 'lstm_units': 64, 'dense_units': 64, 'dropout': 0.5, 'learning_rate': 0.0010450500402154697, 'window_size': 20} | objectives: [0.2574999928474426, 0.0, 5.166003603146687]
+2026-02-24 18:40:05 [INFO] __main__: Re-windowing with MOPSO-selected window=20, stride=3
+2026-02-24 18:40:06 [INFO] src.utils: Plot saved -> mopso_results\pareto_front.png
+2026-02-24 18:40:06 [INFO] __main__: MOPSO best config: {'cnn_filters_1': 32, 'cnn_filters_2': 64, 'cnn_kernel_1': 3, 'cnn_kernel_2': 3, 'cnn_pool_size': 2, 'gru_units': 32, 'gru_return_seq': True, 'lstm_units': 64, 'dense_units': 64, 'dropout': 0.5, 'num_classes': 4, 'focal_gamma': 2.0}
+2026-02-24 18:40:06 [INFO] __main__: Merging train+val for final training: 41457 + 7097 = 48554 windows
+2026-02-24 18:40:06 [INFO] __main__: Recomputed class weights on merged set: {0: 2.3445467422096318, 1: 0.47913870687613486, 2: 2.1408289241622573, 3: 2.620197150669161}
+2026-02-24 18:40:06 [INFO] __main__: Stage 3/4 — Building model …
+2026-02-24 18:40:06 [INFO] __main__: Stage 4/4 — Training …
+2026-02-24 18:47:53 [INFO] __main__: Training completed in 466.8s
+2026-02-24 18:47:54 [INFO] __main__: Loaded best checkpoint: checkpoints\best_model.keras
+2026-02-24 18:47:54 [INFO] __main__: Evaluating on test set …
+2026-02-24 18:47:56 [INFO] __main__: ============================================================
+2026-02-24 18:47:56 [INFO] __main__:   TEST RESULTS
+2026-02-24 18:47:56 [INFO] __main__:   Accuracy        : 0.9751
+2026-02-24 18:47:56 [INFO] __main__:   Cohen's Kappa   : 0.9611
+2026-02-24 18:47:56 [INFO] __main__:   Mean FAR        : 0.0120
+2026-02-24 18:47:56 [INFO] __main__:   Sleep Efficiency: 0.8215
+2026-02-24 18:47:56 [INFO] __main__:   Sleep Quality ^ : 94.28 / 100
+2026-02-24 18:47:56 [INFO] __main__: ============================================================
+2026-02-24 18:47:56 [INFO] __main__:   Awake  -> P=0.996 R=0.998 F1=0.997  FAR=0.001
+2026-02-24 18:47:56 [INFO] __main__:   Light  -> P=0.963 R=0.995 F1=0.979  FAR=0.042
+2026-02-24 18:47:56 [INFO] __main__:   Deep   -> P=0.995 R=0.965 F1=0.980  FAR=0.001
+2026-02-24 18:47:56 [INFO] __main__:   REM    -> P=0.974 R=0.884 F1=0.927  FAR=0.004
+2026-02-24 18:47:56 [INFO] src.utils: Metrics saved -> logs\test_metrics.json
+2026-02-24 18:47:56 [INFO] src.utils: Plot saved -> logs\class_distribution_train.png
+2026-02-24 18:47:56 [INFO] src.utils: Generating comprehensive plot suite -> logs/
+2026-02-24 18:47:57 [INFO] src.utils: Plot saved -> logs/training_curves.png
+2026-02-24 18:47:57 [INFO] src.utils: Plot saved -> logs/confusion_matrix.png
+2026-02-24 18:47:58 [INFO] src.utils: Plot saved -> logs/confusion_matrix_counts.png
+2026-02-24 18:47:59 [INFO] src.utils: Plot saved -> logs/hypnogram_predicted.png
+2026-02-24 18:48:01 [INFO] src.utils: Plot saved -> logs/hypnogram_comparison.png
+2026-02-24 18:48:01 [INFO] src.utils: Plot saved -> logs/per_class_metrics.png
+2026-02-24 18:48:02 [INFO] src.utils: Plot saved -> logs/false_alarm_rates.png
+2026-02-24 18:48:02 [INFO] src.utils: Plot saved -> logs/metrics_radar.png
+2026-02-24 18:48:02 [INFO] src.utils: Plot saved -> logs/metrics_summary_table.png
+2026-02-24 18:48:03 [INFO] src.utils: Plot saved -> logs/roc_curves.png
+2026-02-24 18:48:03 [INFO] src.utils: Plot saved -> logs/confidence_distribution.png
+2026-02-24 18:48:04 [INFO] src.utils: Plot saved -> logs/stage_probabilities.png
+2026-02-24 18:48:04 [INFO] src.utils: Plot saved -> logs/class_distribution_true.png
+2026-02-24 18:48:04 [INFO] src.utils: Plot saved -> logs/class_distribution_pred.png
+2026-02-24 18:48:05 [INFO] src.utils: Plot saved -> logs/transition_matrix_pred.png
+2026-02-24 18:48:06 [INFO] src.utils: Plot saved -> logs/transition_matrix_true.png
+2026-02-24 18:48:09 [INFO] src.utils: Plot saved -> logs/feature_correlation.png
+2026-02-24 18:48:09 [INFO] src.utils: Plot saved -> logs/sleep_quality_gauge.png
+2026-02-24 18:48:11 [INFO] src.utils: Plot saved -> logs/dashboard.png
+2026-02-24 18:48:11 [INFO] src.utils: All 21 plots saved to logs/
+2026-02-24 18:48:11 [INFO] __main__: All outputs saved to 'logs/' and 'checkpoints/'
+2026-02-24 18:48:11 [INFO] __main__: Done.
+2026-02-24 19:14:23 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-02-24 19:14:23 [INFO] __main__: ============================================================
+2026-02-24 19:14:23 [INFO] __main__:   Sleep Intelligence System -- Training
+2026-02-24 19:14:23 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-02-24 19:14:23 [INFO] __main__: ============================================================
+2026-02-24 19:14:23 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-02-24 19:14:28 [INFO] src.utils: Scaler saved -> checkpoints\scaler.pkl
+2026-02-24 19:14:28 [INFO] __main__: Data ready -> train: (59394, 30, 22) | val: (6894, 30, 22) | test: (7279, 30, 22)  (4.6s)
+2026-02-24 19:14:28 [INFO] __main__: Stage 2/4 — MOPSO hyperparameter optimisation …
+2026-02-24 19:14:29 [INFO] __main__: Loading existing MOPSO results (--load_mopso) …
+2026-02-24 19:14:29 [INFO] src.mopso: Loaded 6 Pareto solutions from mopso_results\mopso_results.json
+2026-02-24 19:14:29 [INFO] src.mopso: Selected hyperparams [balanced]: {'cnn_filters_1': 32, 'cnn_filters_2': 64, 'gru_units': 32, 'lstm_units': 64, 'dense_units': 64, 'dropout': 0.5, 'learning_rate': 0.0010450500402154697, 'window_size': 20} | objectives: [0.2574999928474426, 0.0, 5.166003603146687]
+2026-02-24 19:14:29 [INFO] __main__: Re-windowing with MOPSO-selected window=20, stride=3
+2026-02-24 19:14:31 [INFO] src.utils: Plot saved -> mopso_results\pareto_front.png
+2026-02-24 19:14:31 [INFO] __main__: MOPSO best config: {'cnn_filters_1': 32, 'cnn_filters_2': 64, 'cnn_kernel_1': 3, 'cnn_kernel_2': 3, 'cnn_pool_size': 2, 'gru_units': 32, 'gru_return_seq': True, 'lstm_units': 64, 'dense_units': 64, 'dropout': 0.5, 'num_classes': 4, 'focal_gamma': 2.0}
+2026-02-24 19:14:31 [INFO] __main__: Merging train+val for final training: 41457 + 7097 = 48554 windows
+2026-02-24 19:14:31 [INFO] __main__: Recomputed class weights on merged set: {0: 2.3445467422096318, 1: 0.47913870687613486, 2: 2.1408289241622573, 3: 2.620197150669161}
+2026-02-24 19:14:31 [INFO] __main__: Stage 3/4 — Building model …
+2026-02-24 19:14:31 [INFO] __main__: Stage 4/4 — Training …
+2026-02-24 19:14:31 [INFO] __main__: Monitor split: 43701 train / 4853 monitor (10% hold-out from merged set)
+2026-02-24 19:21:16 [INFO] __main__: Training completed in 405.3s
+2026-02-24 19:21:17 [INFO] __main__: Loaded best checkpoint: checkpoints\best_model.keras
+2026-02-24 19:21:17 [INFO] __main__: Evaluating on test set …
+2026-02-24 19:21:19 [INFO] __main__: ============================================================
+2026-02-24 19:21:19 [INFO] __main__:   TEST RESULTS
+2026-02-24 19:21:19 [INFO] __main__:   Accuracy        : 0.9686
+2026-02-24 19:21:19 [INFO] __main__:   Cohen's Kappa   : 0.9514
+2026-02-24 19:21:19 [INFO] __main__:   Mean FAR        : 0.0125
+2026-02-24 19:21:19 [INFO] __main__:   Sleep Efficiency: 0.8155
+2026-02-24 19:21:19 [INFO] __main__:   Sleep Quality ^ : 93.65 / 100
+2026-02-24 19:21:19 [INFO] __main__: ============================================================
+2026-02-24 19:21:19 [INFO] __main__:   Awake  -> P=0.966 R=1.000 F1=0.983  FAR=0.008
+2026-02-24 19:21:19 [INFO] __main__:   Light  -> P=0.974 R=0.976 F1=0.975  FAR=0.029
+2026-02-24 19:21:19 [INFO] __main__:   Deep   -> P=0.947 R=0.997 F1=0.971  FAR=0.010
+2026-02-24 19:21:19 [INFO] __main__:   REM    -> P=0.978 R=0.871 F1=0.921  FAR=0.003
+2026-02-24 19:21:19 [INFO] src.utils: Metrics saved -> logs\test_metrics.json
+2026-02-24 19:21:19 [INFO] src.utils: Plot saved -> logs\class_distribution_train.png
+2026-02-24 19:21:19 [INFO] src.utils: Generating comprehensive plot suite -> logs/
+2026-02-24 19:21:20 [INFO] src.utils: Plot saved -> logs/training_curves.png
+2026-02-24 19:21:20 [INFO] src.utils: Plot saved -> logs/confusion_matrix.png
+2026-02-24 19:21:21 [INFO] src.utils: Plot saved -> logs/confusion_matrix_counts.png
+2026-02-24 19:21:22 [INFO] src.utils: Plot saved -> logs/hypnogram_predicted.png
+2026-02-24 19:21:24 [INFO] src.utils: Plot saved -> logs/hypnogram_comparison.png
+2026-02-24 19:21:24 [INFO] src.utils: Plot saved -> logs/per_class_metrics.png
+2026-02-24 19:21:24 [INFO] src.utils: Plot saved -> logs/false_alarm_rates.png
+2026-02-24 19:21:25 [INFO] src.utils: Plot saved -> logs/metrics_radar.png
+2026-02-24 19:21:25 [INFO] src.utils: Plot saved -> logs/metrics_summary_table.png
+2026-02-24 19:21:25 [INFO] src.utils: Plot saved -> logs/roc_curves.png
+2026-02-24 19:21:26 [INFO] src.utils: Plot saved -> logs/confidence_distribution.png
+2026-02-24 19:21:26 [INFO] src.utils: Plot saved -> logs/stage_probabilities.png
+2026-02-24 19:21:27 [INFO] src.utils: Plot saved -> logs/class_distribution_true.png
+2026-02-24 19:21:27 [INFO] src.utils: Plot saved -> logs/class_distribution_pred.png
+2026-02-24 19:21:27 [INFO] src.utils: Plot saved -> logs/transition_matrix_pred.png
+2026-02-24 19:21:28 [INFO] src.utils: Plot saved -> logs/transition_matrix_true.png
+2026-02-24 19:21:31 [INFO] src.utils: Plot saved -> logs/feature_correlation.png
+2026-02-24 19:21:32 [INFO] src.utils: Plot saved -> logs/sleep_quality_gauge.png
+2026-02-24 19:21:34 [INFO] src.utils: Plot saved -> logs/dashboard.png
+2026-02-24 19:21:34 [INFO] src.utils: All 21 plots saved to logs/
+2026-02-24 19:21:34 [INFO] __main__: All outputs saved to 'logs/' and 'checkpoints/'
+2026-02-24 19:21:34 [INFO] __main__: Done.

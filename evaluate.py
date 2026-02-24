@@ -126,25 +126,25 @@ def evaluate_and_report(
     metrics["sleep_quality_score"] = sqs
 
     # ── Print report ────────────────────────────────────────────
-    print("\n" + "═" * 64)
-    print(f"  Sleep Evaluation Report — {tag.upper()}")
-    print("═" * 64)
+    print("\n" + "=" * 64)
+    print(f"  Sleep Evaluation Report -- {tag.upper()}")
+    print("=" * 64)
     print(f"  Accuracy          : {metrics['accuracy']:.4f}")
     print(f"  Cohen's Kappa     : {metrics['kappa']:.4f}")
     print(f"  Mean FAR          : {metrics['mean_false_alarm_rate']:.4f}")
     print(f"  Sleep Efficiency  : {metrics['sleep_efficiency']:.4f}")
     if metrics["hrv_recovery_score"] is not None:
         print(f"  HRV Recovery Scr  : {metrics['hrv_recovery_score']:.4f}")
-    print(f"  Sleep Quality ↑   : {metrics['sleep_quality_score']:.2f} / 100")
-    print("─" * 64)
+    print(f"  Sleep Quality ^   : {metrics['sleep_quality_score']:.2f} / 100")
+    print("-" * 64)
     print(f"  {'Stage':<8}  {'Precision':>9}  {'Recall':>7}  {'F1':>6}  {'FAR':>7}")
-    print("─" * 64)
+    print("-" * 64)
     for stage in stage_names:
         pr = metrics["per_class"].get(stage, {})
         far = metrics["false_alarm_rate_per_class"].get(stage, 0)
         print(f"  {stage:<8}  {pr.get('precision',0):>9.4f}  "
               f"{pr.get('recall',0):>7.4f}  {pr.get('f1-score',0):>6.4f}  {far:>7.4f}")
-    print("═" * 64 + "\n")
+    print("=" * 64 + "\n")
 
     # ── Save outputs ────────────────────────────────────────────
     save_metrics(metrics, str(Path(out_dir) / f"{tag}_metrics.json"))

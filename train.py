@@ -84,6 +84,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--mopso_priority",  default="balanced",
                    choices=["accuracy", "efficiency", "balanced"],
                    help="How to select best MOPSO solution (default: balanced)")
+    p.add_argument("--load_mopso",      action="store_true",
+                   help="Load previous MOPSO results instead of re-running optimization")
     p.add_argument("--smoke_test",      action="store_true",
                    help="Quick 2-epoch test with reduced data")
     p.add_argument("--epochs",          type=int, default=None,
@@ -122,10 +124,10 @@ def main() -> None:
     tf.config.threading.set_intra_op_parallelism_threads(N_CORES)
     tf.config.threading.set_inter_op_parallelism_threads(N_CORES)
 
-    logger.info("═" * 60)
-    logger.info("  Sleep Intelligence System — Training")
+    logger.info("=" * 60)
+    logger.info("  Sleep Intelligence System -- Training")
     logger.info("  TF version: %s  |  Cores: %d", tf.__version__, N_CORES)
-    logger.info("═" * 60)
+    logger.info("=" * 60)
 
     # ── Override config with CLI args ──────────────────────────
     if args.smoke_test:
@@ -168,7 +170,7 @@ def main() -> None:
     window_size = X_train.shape[1]
 
     logger.info(
-        "Data ready → train: %s | val: %s | test: %s  (%.1fs)",
+        "Data ready -> train: %s | val: %s | test: %s  (%.1fs)",
         X_train.shape, X_val.shape, X_test.shape, time.time() - t0
     )
 
@@ -189,7 +191,7 @@ def main() -> None:
         # We need raw DFs for re-windowing inside MOPSO workers
         from src.preprocessing import load_raw, user_split, apply_scaler, fit_scaler
         raw_df = load_raw(cfg["data"]["dataset_path"])
-        df_tr_raw, df_va_raw, _ = user_split(
+        df_tr_raw, df_va_raw, df_te_raw = user_split(
             raw_df,
             cfg["data"]["val_ratio"],
             cfg["data"]["test_ratio"],
@@ -198,6 +200,7 @@ def main() -> None:
         scaler = data["scaler"]
         df_tr_scaled = apply_scaler(df_tr_raw, scaler, cfg["data"]["feature_cols"])
         df_va_scaled = apply_scaler(df_va_raw, scaler, cfg["data"]["feature_cols"])
+        df_te_scaled = apply_scaler(df_te_raw, scaler, cfg["data"]["feature_cols"])
 
         mopso_data = {
             **data,
@@ -210,11 +213,16 @@ def main() -> None:
         mopso = MOPSO(
             n_particles=n_particles,
             max_iter=n_iter,
-            n_jobs=1,
-            quick_epochs=1 if not args.smoke_test else 1,
+            n_jobs=cfg["mopso"]["n_jobs"],
+            quick_epochs=cfg["mopso"]["quick_epochs"] if not args.smoke_test else 1,
             pareto_dir=cfg["mopso"]["pareto_dir"],
         )
-        pareto = mopso.optimize(mopso_data, n_features=n_features)
+        if args.load_mopso:
+            logger.info("Loading existing MOPSO results (--load_mopso) …")
+            mopso.load_results()
+            pareto = mopso.pareto_archive
+        else:
+            pareto = mopso.optimize(mopso_data, n_features=n_features)
         best_hp = mopso.best_hyperparams(priority=args.mopso_priority)
 
         # Update model_cfg with MOPSO-found values
@@ -228,21 +236,43 @@ def main() -> None:
 
         # Re-window if MOPSO changed window_size
         if window_size != X_train.shape[1]:
-            logger.info("Re-windowing with MOPSO-selected window=%d", window_size)
+            logger.info("Re-windowing with MOPSO-selected window=%d, stride=%d",
+                        window_size, cfg["data"]["stride"])
             from src.preprocessing import create_windows
-            X_train, y_train = create_windows(df_tr_scaled, window_size,
-                                               window_size // 3,
+            _stride = cfg["data"]["stride"]
+            X_train, y_train = create_windows(df_tr_scaled, window_size, _stride,
                                                cfg["data"]["feature_cols"], N_CORES)
-            X_val, y_val = create_windows(df_va_scaled, window_size,
-                                           window_size // 3,
+            X_val, y_val = create_windows(df_va_scaled, window_size, _stride,
                                            cfg["data"]["feature_cols"], N_CORES)
+            X_test, y_test = create_windows(df_te_scaled, window_size, _stride,
+                                            cfg["data"]["feature_cols"], N_CORES)
 
         plot_pareto_front(pareto, str(Path(cfg["mopso"]["pareto_dir"]) / "pareto_front.png"))
         logger.info("MOPSO best config: %s", model_cfg)
     else:
         logger.info("Stage 2/4 — MOPSO skipped (use --mopso to enable)")
 
-    # ── Model creation ─────────────────────────────────────────
+    # ── Merge train + val for final model training ─────────────
+    # Val set was needed during MOPSO (hyperparameter search) and for
+    # early-stopping signal.  Now that hyperparameters are fixed, merging
+    # train+val gives the model 85 % of the dataset instead of 70 %.
+    # The held-out test set (15 %) is never touched until final evaluation.
+    logger.info(
+        "Merging train+val for final training: %d + %d = %d windows",
+        len(X_train), len(X_val), len(X_train) + len(X_val),
+    )
+    X_train = np.concatenate([X_train, X_val], axis=0)
+    y_train = np.concatenate([y_train, y_val], axis=0)
+    # Shuffle the merged set
+    perm = np.random.default_rng(cfg["data"]["random_seed"]).permutation(len(X_train))
+    X_train, y_train = X_train[perm], y_train[perm]
+    # Recompute class weights on the merged labels
+    from src.preprocessing import get_class_weights
+    if cfg["training"]["class_weights"]:
+        class_weights = get_class_weights(y_train, boost_minority=1.5)
+        logger.info("Recomputed class weights on merged set: %s", class_weights)
+
+    # Model creation ─────────────────────────────────────────
     logger.info("Stage 3/4 — Building model …")
     model = build_model(
         window_size=window_size,
@@ -285,8 +315,36 @@ def main() -> None:
         return ds
 
     bs = cfg["training"]["batch_size"]
-    train_ds = make_tf_dataset(X_train, y_train, bs, shuffle=True)
-    val_ds   = make_tf_dataset(X_val,   y_val,   bs, shuffle=False)
+
+    # Carve out a small monitor set from the merged training data for
+    # early-stopping.  This keeps X_test fully blind until final evaluation,
+    # so the reported test metrics are unbiased.  We use a stratified 10 %
+    # hold-out (fixed seed for reproducibility).
+    _monitor_ratio = 0.10
+    _rng = np.random.default_rng(cfg["data"]["random_seed"] + 1)
+    _n_monitor = int(len(X_train) * _monitor_ratio)
+    # Stratified: sample proportionally from each class
+    _monitor_idx = []
+    for _cls in np.unique(y_train):
+        _cls_idx = np.where(y_train == _cls)[0]
+        _n = max(1, int(len(_cls_idx) * _monitor_ratio))
+        _monitor_idx.extend(_rng.choice(_cls_idx, size=_n, replace=False).tolist())
+    _monitor_idx = np.array(_monitor_idx)
+    _train_mask = np.ones(len(X_train), dtype=bool)
+    _train_mask[_monitor_idx] = False
+
+    X_monitor, y_monitor = X_train[_monitor_idx], y_train[_monitor_idx]
+    X_train_fit, y_train_fit = X_train[_train_mask], y_train[_train_mask]
+
+    logger.info(
+        "Monitor split: %d train / %d monitor (%.0f%% hold-out from merged set)",
+        len(X_train_fit), len(X_monitor), _monitor_ratio * 100,
+    )
+
+    train_ds = make_tf_dataset(X_train_fit, y_train_fit, bs, shuffle=True)
+    # Shuffle monitor set so temporal ordering doesn't cause oscillating
+    # per-epoch accuracy (sleep stages are temporally autocorrelated).
+    val_ds   = make_tf_dataset(X_monitor,   y_monitor,   bs, shuffle=True, buffer=len(X_monitor))
 
     t_train = time.time()
     history = model.fit(
@@ -328,19 +386,19 @@ def main() -> None:
     )
     metrics["sleep_quality_score"] = sqs
 
-    logger.info("═" * 60)
+    logger.info("=" * 60)
     logger.info("  TEST RESULTS")
     logger.info("  Accuracy        : %.4f", metrics["accuracy"])
     logger.info("  Cohen's Kappa   : %.4f", metrics["kappa"])
     logger.info("  Mean FAR        : %.4f", metrics["mean_false_alarm_rate"])
     logger.info("  Sleep Efficiency: %.4f", metrics["sleep_efficiency"])
-    logger.info("  Sleep Quality ↑ : %.2f / 100", metrics["sleep_quality_score"])
-    logger.info("═" * 60)
+    logger.info("  Sleep Quality ^ : %.2f / 100", metrics["sleep_quality_score"])
+    logger.info("=" * 60)
 
     # Per-stage metrics
     for stage in data["stage_names"]:
         pr = metrics["per_class"].get(stage, {})
-        logger.info("  %-6s → P=%.3f R=%.3f F1=%.3f  FAR=%.3f",
+        logger.info("  %-6s -> P=%.3f R=%.3f F1=%.3f  FAR=%.3f",
                     stage,
                     pr.get("precision", 0),
                     pr.get("recall", 0),
@@ -379,7 +437,7 @@ def main() -> None:
     )
 
     logger.info("All outputs saved to '%s/' and '%s/'", log_dir, ckpt_dir)
-    logger.info("Done ✓")
+    logger.info("Done.")
 
 
 if __name__ == "__main__":

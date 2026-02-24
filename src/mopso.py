@@ -167,36 +167,54 @@ def _evaluate_candidate(
     model = build_from_config(cfg, window_size, n_features,
                               class_weights=data.get("class_weights"))
 
-    # Sub-sample aggressively for speed during MOPSO fitness calls
-    # Kept small so each CPU trial finishes in ~15-30 s
-    max_tr = min(len(X_tr), 800)
+    # Subsample for MOPSO fitness evaluation.
+    # 2 500 train / 800 val balances signal quality vs per-worker memory.
+    # batch_size=64 (not 256) is critical: BiGRU/BiLSTM backprop with large
+    # batches in multiple concurrent workers causes CPU OOM.
+    max_tr = min(len(X_tr), 2500)
     idx_tr = np.random.choice(len(X_tr), max_tr, replace=False)
-    max_va = min(len(X_va), 300)
+    max_va = min(len(X_va), 800)
     idx_va = np.random.choice(len(X_va), max_va, replace=False)
 
-    model.fit(
-        X_tr[idx_tr], y_tr[idx_tr],
-        validation_data=(X_va[idx_va], y_va[idx_va]),
-        epochs=quick_epochs,
-        batch_size=256,
-        verbose=1,
-    )
+    try:
+        model.fit(
+            X_tr[idx_tr], y_tr[idx_tr],
+            validation_data=(X_va[idx_va], y_va[idx_va]),
+            epochs=quick_epochs,
+            batch_size=64,
+            verbose=1,
+        )
 
-    loss, acc = model.evaluate(X_va[idx_va], y_va[idx_va], verbose=0)
+        loss, acc = model.evaluate(X_va[idx_va], y_va[idx_va], verbose=0)
 
-    # False alarm rate: fraction of non-apnea windows flagged as Awake
-    # when true label is Sleep (class 1,2,3).
-    y_pred = np.argmax(model.predict(X_va[idx_va], verbose=0), axis=1)
-    sleep_mask = y_va[idx_va] > 0                   # true sleep epochs
-    if sleep_mask.sum() > 0:
-        false_alarm_rate = float((y_pred[sleep_mask] == 0).sum() / sleep_mask.sum())
-    else:
-        false_alarm_rate = 0.0
+        # False alarm rate: fraction of non-apnea windows flagged as Awake
+        # when true label is Sleep (class 1,2,3).
+        y_pred = np.argmax(model.predict(X_va[idx_va], verbose=0), axis=1)
+        sleep_mask = y_va[idx_va] > 0                   # true sleep epochs
+        if sleep_mask.sum() > 0:
+            false_alarm_rate = float((y_pred[sleep_mask] == 0).sum() / sleep_mask.sum())
+        else:
+            false_alarm_rate = 0.0
 
-    log_params = float(np.log10(max(model_param_count(model), 1)))
-    tf.keras.backend.clear_session()
+        log_params = float(np.log10(max(model_param_count(model), 1)))
+        result = (1.0 - float(acc)), false_alarm_rate, log_params
+    except Exception as e:  # catches OOM and any other per-worker failure
+        import logging as _log
+        _log.getLogger(__name__).warning(
+            "MOPSO candidate failed (%s: %s) — returning worst-case objectives.",
+            type(e).__name__, str(e)[:120]
+        )
+        result = (1.0, 1.0, 6.0)  # worst-case: 0% acc, 100% FAR, 1M params
+    finally:
+        # Explicitly delete the model BEFORE clear_session to release all
+        # TF tensors held by this worker.  Without this, loky reuses the
+        # worker process and the TF graph grows unboundedly each iteration,
+        # causing the per-iter wall time to blow up (370s → 1200s+).
+        del model
+        tf.keras.backend.clear_session()
+        import gc; gc.collect()
 
-    return (1.0 - float(acc)), false_alarm_rate, log_params
+    return result
 
 
 def model_param_count(model) -> int:
@@ -392,10 +410,10 @@ class MOPSO:
             idx = int(np.argmin(objs[:, 0]))
         elif priority == "efficiency":
             # Weighted sum: accuracy × 0.5 + efficiency × 0.5
-            norm = (objs - objs.min(0)) / (objs.ptp(0) + 1e-9)
+            norm = (objs - objs.min(0)) / (objs.max(0) - objs.min(0) + 1e-9)
             idx = int(np.argmin(0.5 * norm[:, 0] + 0.5 * norm[:, 2]))
         else:  # balanced
-            norm = (objs - objs.min(0)) / (objs.ptp(0) + 1e-9)
+            norm = (objs - objs.min(0)) / (objs.max(0) - objs.min(0) + 1e-9)
             score = norm.mean(axis=1)
             idx = int(np.argmin(score))
 
@@ -416,7 +434,7 @@ class MOPSO:
         path = self.pareto_dir / "mopso_results.json"
         with open(path, "w") as f:
             json.dump(out, f, indent=2)
-        logger.info("MOPSO results saved → %s", path)
+        logger.info("MOPSO results saved -> %s", path)
 
     def load_results(self, path: Optional[str] = None) -> None:
         path = path or str(self.pareto_dir / "mopso_results.json")

@@ -261,7 +261,7 @@ def save_scaler(scaler, path: str = "checkpoints/scaler.pkl") -> None:
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     with open(path, "wb") as f:
         pickle.dump(scaler, f)
-    logger.info("Scaler saved → %s", path)
+    logger.info("Scaler saved -> %s", path)
 
 
 def load_scaler(path: str = "checkpoints/scaler.pkl"):
@@ -287,7 +287,7 @@ def save_metrics(metrics: dict, path: str = "logs/metrics.json") -> None:
 
     with open(path, "w") as f:
         json.dump(_convert(metrics), f, indent=2)
-    logger.info("Metrics saved → %s", path)
+    logger.info("Metrics saved -> %s", path)
 
 
 # ────────────────────────────────────────────────────────────────
@@ -300,7 +300,7 @@ def _save_fig(fig: plt.Figure, save_path: str) -> None:
     fig.savefig(save_path, dpi=_PLOT_STYLE["DPI"], bbox_inches="tight",
                 facecolor="white", edgecolor="none")
     plt.close(fig)
-    logger.info("Plot saved → %s", save_path)
+    logger.info("Plot saved -> %s", save_path)
 
 
 # ── 1. Training History (Loss + Accuracy + LR) ────────────────
@@ -1101,7 +1101,7 @@ def generate_all_plots(
     d = str(Path(out_dir))
     Path(d).mkdir(parents=True, exist_ok=True)
 
-    logger.info("Generating comprehensive plot suite → %s/", d)
+    logger.info("Generating comprehensive plot suite -> %s/", d)
 
     # Core
     if history is not None:
