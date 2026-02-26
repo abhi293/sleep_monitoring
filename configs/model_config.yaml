@@ -37,7 +37,7 @@ data:
     Deep:  2
     REM:   3
   # Windowing
-  window_size: 30         # timesteps per sample (30 min)
+  window_size: 20         # timesteps per sample — must match the saved checkpoint
   stride: 3               # stride between windows (small stride = more samples from same raw data)
   # Train/val/test split (by user ID)
   val_ratio:  0.15

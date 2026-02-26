@@ -1,0 +1,28 @@
+2026-02-26 17:16:43 [INFO] __main__: Loading model...
+2026-02-26 17:16:44 [INFO] src.preprocessing: Loading dataset from test.csv …
+2026-02-26 17:16:44 [INFO] src.preprocessing: Dataset loaded: 29308 rows × 28 cols | stages: {'Light': 14809, 'Awake': 5067, 'Deep': 4970, 'REM': 4462}
+2026-02-26 17:16:44 [INFO] src.preprocessing: Windowing 15 user-day groups (window=20, stride=3) on 4 workers …
+2026-02-26 17:16:50 [INFO] src.preprocessing: Windows created: X=(1776, 20, 22)  y=(1776,)
+2026-02-26 17:16:50 [INFO] __main__: Evaluating on 1776 windows
+2026-02-26 17:16:53 [INFO] src.utils: Metrics saved -> evaluation_results\mixed_dataset\user2\user_2_metrics.json
+2026-02-26 17:16:53 [INFO] __main__: Generating FULL plot suite
+2026-02-26 17:16:53 [INFO] src.utils: Generating comprehensive plot suite -> evaluation_results\mixed_dataset\user2/
+2026-02-26 17:16:55 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/confusion_matrix.png
+2026-02-26 17:16:56 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/confusion_matrix_counts.png
+2026-02-26 17:16:58 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/hypnogram_predicted.png
+2026-02-26 17:17:01 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/hypnogram_comparison.png
+2026-02-26 17:17:02 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/per_class_metrics.png
+2026-02-26 17:17:02 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/false_alarm_rates.png
+2026-02-26 17:17:03 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/metrics_radar.png
+2026-02-26 17:17:03 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/metrics_summary_table.png
+2026-02-26 17:17:04 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/roc_curves.png
+2026-02-26 17:17:04 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/confidence_distribution.png
+2026-02-26 17:17:05 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/stage_probabilities.png
+2026-02-26 17:17:06 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/class_distribution_true.png
+2026-02-26 17:17:06 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/class_distribution_pred.png
+2026-02-26 17:17:07 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/transition_matrix_pred.png
+2026-02-26 17:17:08 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/transition_matrix_true.png
+2026-02-26 17:17:24 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/feature_correlation.png
+2026-02-26 17:17:24 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/sleep_quality_gauge.png
+2026-02-26 17:17:28 [INFO] src.utils: Plot saved -> evaluation_results\mixed_dataset\user2/dashboard.png
+2026-02-26 17:17:28 [INFO] src.utils: All 18 plots saved to evaluation_results\mixed_dataset\user2/
