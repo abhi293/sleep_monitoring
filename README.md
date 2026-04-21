@@ -6,7 +6,7 @@ Comprehensive repository README for a non-invasive sleep intelligence prototype 
 
 ## Overview
 
-This project aims to build a real-world sleep monitoring prototype that goes beyond total sleep duration by integrating multi-modal signals to estimate sleep stages, detect respiratory disturbances and restlessness, and compute sleep & recovery scores.
+This project implements a sleep monitoring system using machine learning to analyze sleep patterns and detect anomalies. The system processes sleep data through preprocessing, model training, and evaluation pipelines, combining multi-modal signals to estimate sleep stages, detect respiratory disturbances and restlessness, and compute sleep & recovery scores.
 
 Key goals:
 - Detect sleep stages (light / deep / REM)
@@ -16,6 +16,64 @@ Key goals:
 - Optimize models and thresholds with multi-objective PSO (MOPSO)
 
 ---
+
+## Project Structure
+
+```
+DOCUMENTATION.md        # Detailed technical documentation
+README.md               # Project overview (this file)
+evaluate.py             # Model evaluation script
+requirements.txt        # Python dependencies
+train.py                # Model training script
+__pycache__/            # Python cache files
+checkpoints/            # Model checkpoints
+  best_model.keras      # Best trained model
+configs/                # Configuration files
+  model_config.yaml     # Model hyperparameters
+mopso_results/          # Multi-objective optimization results
+old_dataset/            # Raw dataset files
+  realistic_sleep_dataset_v3.csv
+src/                    # Source code
+  model.py              # Model architecture
+  mopso.py              # Multi-objective optimization
+  preprocessing.py      # Data preprocessing
+  utils.py              # Utility functions
+```
+
+---
+
+## Features
+
+- Physiological: HR, HRV, SpO₂, skin temperature
+- Breathing: respiration rate, irregular breathing events
+- Movement: micro-movements, tossing & turning
+- Environment: temperature, humidity, light exposure
+- On-device logging (SD card), RTC timestamping, local summary on OLED
+
+## Setup Instructions
+1. **Install dependencies**: 
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. **Dataset preparation**: 
+   - Place CSV files in `old_dataset/`
+   - Preprocessed data will be saved in `processed_data/`
+3. **Model configuration**: 
+   - Adjust hyperparameters in `configs/model_config.yaml`
+
+## Training & Evaluation
+- **Training**: Run `python train.py`
+- **Evaluation**: Run `python evaluate.py`
+- **Results**: 
+  - Evaluation metrics: `evaluation_results/mixed_dataset/user2/`
+  - Training logs: `logs/training_log.csv`
+
+## Technical Details
+- **Model architecture**: LSTM-based neural network (see `src/model.py`)
+- **Optimization**: Multi-objective PSO algorithm (see `src/mopso.py`)
+- **Data pipeline**: 
+  1. Raw data → `preprocessing.py` → Cleaned data
+  2. Cleaned data → `train.py` → Model training
 
 ## Features
 
@@ -45,6 +103,9 @@ Recommended sensor list and role:
 Hardware notes:
 - Prefer I2C sensors (MPU6050, BH1750) on the same bus with unique addresses.
 - Use level shifting where needed; ensure clean power and decoupling for MAX30102.
+
+## License
+MIT License - see LICENSE file
 
 ---
 
@@ -199,7 +260,3 @@ This project uses the MIT License — see the `LICENSE` file for details.
 
 ---
 
-If you'd like, I can now:
-- add example `train.py` and `requirements.txt`, or
-- scaffold the ESP32 firmware folder with basic sensor-read logging, or
-- create a minimal data preprocessing notebook using [realistic_sleep_dataset_v4.csv](realistic_sleep_dataset_v4.csv)
