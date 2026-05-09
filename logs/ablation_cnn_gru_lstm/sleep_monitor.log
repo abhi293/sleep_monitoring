@@ -1,0 +1,112 @@
+2026-05-10 02:01:24 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-05-10 02:01:24 [INFO] __main__: ============================================================
+2026-05-10 02:01:24 [INFO] __main__:   Sleep Intelligence System -- Training
+2026-05-10 02:01:24 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-05-10 02:01:24 [INFO] __main__:   Config source: built-in defaults (--no_config)
+2026-05-10 02:01:24 [INFO] __main__:   Ablation components: CNN=True | GRU=True | LSTM=True | variant=cnn_gru_lstm
+2026-05-10 02:01:24 [INFO] __main__: ============================================================
+2026-05-10 02:01:24 [INFO] __main__: Using built-in ablation model/training defaults; config model hyperparameters ignored.
+2026-05-10 02:01:24 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-05-10 02:01:33 [INFO] src.utils: Scaler saved -> checkpoints\ablation_cnn_gru_lstm\scaler.pkl
+2026-05-10 02:01:33 [INFO] __main__: Data ready -> train: (17561, 30, 22) | val: (2318, 30, 22) | test: (2296, 30, 22)  (8.8s)
+2026-05-10 02:01:33 [INFO] __main__: Stage 2/4 — MOPSO skipped (use --mopso to enable)
+2026-05-10 02:01:33 [INFO] __main__: Keeping original validation split for ablation monitoring: train=17561 val=2318
+2026-05-10 02:01:33 [INFO] __main__: Stage 3/4 — Building model …
+2026-05-10 02:01:33 [INFO] __main__: Stage 4/4 — Training …
+2026-05-10 02:01:33 [INFO] __main__: Using original validation set for monitoring: 2318 windows
+2026-05-10 02:04:34 [INFO] __main__: Training completed in 181.1s
+2026-05-10 02:04:35 [INFO] __main__: Loaded best checkpoint: checkpoints\ablation_cnn_gru_lstm\best_model.keras
+2026-05-10 02:04:35 [INFO] __main__: Evaluating on test set …
+2026-05-10 02:04:38 [INFO] __main__: ============================================================
+2026-05-10 02:04:38 [INFO] __main__:   TEST RESULTS
+2026-05-10 02:04:38 [INFO] __main__:   Accuracy        : 0.9482
+2026-05-10 02:04:38 [INFO] __main__:   Cohen's Kappa   : 0.9228
+2026-05-10 02:04:38 [INFO] __main__:   Mean FAR        : 0.0166
+2026-05-10 02:04:38 [INFO] __main__:   Sleep Efficiency: 0.8484
+2026-05-10 02:04:38 [INFO] __main__:   Sleep Quality ^ : 92.72 / 100
+2026-05-10 02:04:38 [INFO] __main__: ============================================================
+2026-05-10 02:04:38 [INFO] __main__:   Awake  -> P=0.966 R=0.968 F1=0.967  FAR=0.006
+2026-05-10 02:04:38 [INFO] __main__:   Light  -> P=0.986 R=0.926 F1=0.955  FAR=0.013
+2026-05-10 02:04:38 [INFO] __main__:   Deep   -> P=0.987 R=0.976 F1=0.981  FAR=0.003
+2026-05-10 02:04:38 [INFO] __main__:   REM    -> P=0.786 R=0.966 F1=0.867  FAR=0.044
+2026-05-10 02:04:38 [INFO] src.utils: Metrics saved -> logs\ablation_cnn_gru_lstm\test_metrics.json
+2026-05-10 02:04:38 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm\class_distribution_train.png
+2026-05-10 02:04:38 [INFO] src.utils: Generating comprehensive plot suite -> logs\ablation_cnn_gru_lstm/
+2026-05-10 02:04:40 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/training_curves.png
+2026-05-10 02:04:40 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/confusion_matrix.png
+2026-05-10 02:04:41 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/confusion_matrix_counts.png
+2026-05-10 02:04:43 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/hypnogram_predicted.png
+2026-05-10 02:04:46 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/hypnogram_comparison.png
+2026-05-10 02:04:46 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/per_class_metrics.png
+2026-05-10 02:04:46 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/false_alarm_rates.png
+2026-05-10 02:04:47 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/metrics_radar.png
+2026-05-10 02:04:47 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/metrics_summary_table.png
+2026-05-10 02:04:48 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/roc_curves.png
+2026-05-10 02:04:48 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/confidence_distribution.png
+2026-05-10 02:04:50 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/stage_probabilities.png
+2026-05-10 02:04:51 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/class_distribution_true.png
+2026-05-10 02:04:51 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/class_distribution_pred.png
+2026-05-10 02:04:53 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/transition_matrix_pred.png
+2026-05-10 02:04:54 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/transition_matrix_true.png
+2026-05-10 02:04:59 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/feature_correlation.png
+2026-05-10 02:04:59 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/sleep_quality_gauge.png
+2026-05-10 02:05:02 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/dashboard.png
+2026-05-10 02:05:02 [INFO] src.utils: All 20 plots saved to logs\ablation_cnn_gru_lstm/
+2026-05-10 02:05:02 [INFO] __main__: All outputs saved to 'logs\ablation_cnn_gru_lstm/' and 'checkpoints\ablation_cnn_gru_lstm/'
+2026-05-10 02:05:02 [INFO] __main__: Done.
+2026-05-10 02:05:45 [INFO] src.utils: TF CPU parallelism configured: 4 threads
+2026-05-10 02:05:45 [INFO] __main__: ============================================================
+2026-05-10 02:05:45 [INFO] __main__:   Sleep Intelligence System -- Training
+2026-05-10 02:05:45 [INFO] __main__:   TF version: 2.20.0  |  Cores: 4
+2026-05-10 02:05:45 [INFO] __main__:   Config source: configs/model_config.yaml
+2026-05-10 02:05:45 [INFO] __main__:   Ablation components: CNN=True | GRU=True | LSTM=True | variant=cnn_gru_lstm
+2026-05-10 02:05:45 [INFO] __main__: ============================================================
+2026-05-10 02:05:45 [INFO] __main__: Using model/training hyperparameters from configs/model_config.yaml
+2026-05-10 02:05:45 [INFO] __main__: Stage 1/4 — Preprocessing …
+2026-05-10 02:05:55 [INFO] src.utils: Scaler saved -> checkpoints\ablation_cnn_gru_lstm\scaler.pkl
+2026-05-10 02:05:55 [INFO] __main__: Data ready -> train: (59646, 20, 22) | val: (7862, 20, 22) | test: (7792, 20, 22)  (10.1s)
+2026-05-10 02:05:55 [INFO] __main__: Stage 2/4 — MOPSO skipped (use --mopso to enable)
+2026-05-10 02:05:55 [INFO] __main__: Keeping original validation split for ablation monitoring: train=59646 val=7862
+2026-05-10 02:05:55 [INFO] __main__: Stage 3/4 — Building model …
+2026-05-10 02:05:56 [INFO] __main__: Stage 4/4 — Training …
+2026-05-10 02:05:56 [INFO] __main__: Using original validation set for monitoring: 7862 windows
+2026-05-10 02:15:49 [INFO] __main__: Training completed in 592.7s
+2026-05-10 02:15:50 [INFO] __main__: Loaded best checkpoint: checkpoints\ablation_cnn_gru_lstm\best_model.keras
+2026-05-10 02:15:50 [INFO] __main__: Evaluating on test set …
+2026-05-10 02:15:53 [INFO] __main__: ============================================================
+2026-05-10 02:15:53 [INFO] __main__:   TEST RESULTS
+2026-05-10 02:15:53 [INFO] __main__:   Accuracy        : 0.9883
+2026-05-10 02:15:53 [INFO] __main__:   Cohen's Kappa   : 0.9823
+2026-05-10 02:15:53 [INFO] __main__:   Mean FAR        : 0.0045
+2026-05-10 02:15:53 [INFO] __main__:   Sleep Efficiency: 0.8401
+2026-05-10 02:15:53 [INFO] __main__:   Sleep Quality ^ : 95.82 / 100
+2026-05-10 02:15:53 [INFO] __main__: ============================================================
+2026-05-10 02:15:53 [INFO] __main__:   Awake  -> P=0.997 R=1.000 F1=0.998  FAR=0.001
+2026-05-10 02:15:53 [INFO] __main__:   Light  -> P=0.990 R=0.992 F1=0.991  FAR=0.010
+2026-05-10 02:15:53 [INFO] __main__:   Deep   -> P=0.991 R=0.985 F1=0.988  FAR=0.002
+2026-05-10 02:15:53 [INFO] __main__:   REM    -> P=0.968 R=0.966 F1=0.967  FAR=0.005
+2026-05-10 02:15:53 [INFO] src.utils: Metrics saved -> logs\ablation_cnn_gru_lstm\test_metrics.json
+2026-05-10 02:15:53 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm\class_distribution_train.png
+2026-05-10 02:15:53 [INFO] src.utils: Generating comprehensive plot suite -> logs\ablation_cnn_gru_lstm/
+2026-05-10 02:15:54 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/training_curves.png
+2026-05-10 02:15:56 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/confusion_matrix.png
+2026-05-10 02:15:57 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/confusion_matrix_counts.png
+2026-05-10 02:15:58 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/hypnogram_predicted.png
+2026-05-10 02:16:01 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/hypnogram_comparison.png
+2026-05-10 02:16:02 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/per_class_metrics.png
+2026-05-10 02:16:02 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/false_alarm_rates.png
+2026-05-10 02:16:03 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/metrics_radar.png
+2026-05-10 02:16:03 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/metrics_summary_table.png
+2026-05-10 02:16:04 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/roc_curves.png
+2026-05-10 02:16:04 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/confidence_distribution.png
+2026-05-10 02:16:06 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/stage_probabilities.png
+2026-05-10 02:16:06 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/class_distribution_true.png
+2026-05-10 02:16:06 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/class_distribution_pred.png
+2026-05-10 02:16:08 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/transition_matrix_pred.png
+2026-05-10 02:16:09 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/transition_matrix_true.png
+2026-05-10 02:16:14 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/feature_correlation.png
+2026-05-10 02:16:14 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/sleep_quality_gauge.png
+2026-05-10 02:16:17 [INFO] src.utils: Plot saved -> logs\ablation_cnn_gru_lstm/dashboard.png
+2026-05-10 02:16:17 [INFO] src.utils: All 20 plots saved to logs\ablation_cnn_gru_lstm/
+2026-05-10 02:16:17 [INFO] __main__: All outputs saved to 'logs\ablation_cnn_gru_lstm/' and 'checkpoints\ablation_cnn_gru_lstm/'
+2026-05-10 02:16:17 [INFO] __main__: Done.
