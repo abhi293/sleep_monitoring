@@ -1,27 +1,27 @@
-2026-05-08 16:36:48 [INFO] __main__: Training pure MAResNet-BiGRU with TensorFlow 2.20.0
-2026-05-08 16:36:48 [INFO] __main__: Dataset: D:\Projects\Sleep\MAResNet_BiGRU\test_new.csv
-2026-05-08 16:36:48 [INFO] __main__: Training uses the standalone architecture defined in train.py.
-2026-05-08 16:36:53 [INFO] __main__: Data ready in 5.1s: train=(3376, 30, 28) val=(1028, 30, 28) test=(1189, 30, 28) class_weights={0: 2.026304801670146, 1: 0.4938560561732007, 2: 1.5937602627257799, 3: 1.6763385146804834}
-2026-05-08 16:38:44 [INFO] src.utils: Metrics saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs\test_metrics.json
-2026-05-08 16:38:44 [INFO] src.utils: Generating comprehensive plot suite -> D:\Projects\Sleep\MAResNet_BiGRU\logs/
-2026-05-08 16:38:45 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/training_curves.png
-2026-05-08 16:38:46 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/confusion_matrix.png
-2026-05-08 16:38:46 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/confusion_matrix_counts.png
-2026-05-08 16:38:48 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/hypnogram_predicted.png
-2026-05-08 16:38:50 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/hypnogram_comparison.png
-2026-05-08 16:38:51 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/per_class_metrics.png
-2026-05-08 16:38:51 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/false_alarm_rates.png
-2026-05-08 16:38:52 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/metrics_radar.png
-2026-05-08 16:38:52 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/metrics_summary_table.png
-2026-05-08 16:38:52 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/roc_curves.png
-2026-05-08 16:38:53 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/confidence_distribution.png
-2026-05-08 16:38:54 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/stage_probabilities.png
-2026-05-08 16:38:55 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/class_distribution_true.png
-2026-05-08 16:38:55 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/class_distribution_pred.png
-2026-05-08 16:38:57 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/transition_matrix_pred.png
-2026-05-08 16:38:59 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/transition_matrix_true.png
-2026-05-08 16:39:08 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/feature_correlation.png
-2026-05-08 16:39:08 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/sleep_quality_gauge.png
-2026-05-08 16:39:11 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/dashboard.png
-2026-05-08 16:39:11 [INFO] src.utils: All 19 plots saved to D:\Projects\Sleep\MAResNet_BiGRU\logs/
-2026-05-08 16:39:11 [INFO] __main__: Test accuracy 0.7805 | Kappa 0.6729 | Mean FAR 0.0806 | Sleep Quality 78.23
+2026-05-09 17:28:51 [INFO] __main__: Training pure MAResNet-BiGRU with TensorFlow 2.20.0
+2026-05-09 17:28:51 [INFO] __main__: Dataset: D:\Projects\Sleep\MAResNet_BiGRU\test_new.csv
+2026-05-09 17:28:51 [INFO] __main__: Training uses the standalone architecture defined in train.py.
+2026-05-09 17:28:59 [INFO] __main__: Data ready in 8.2s: train=(24143, 30, 28) val=(4608, 30, 28) test=(4561, 30, 28) class_weights={0: 1.9016746575342465, 1: 0.47956062291434925, 2: 1.629369131455399, 3: 1.9032389635316695}
+2026-05-09 17:34:14 [INFO] src.utils: Metrics saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs\test_metrics.json
+2026-05-09 17:34:14 [INFO] src.utils: Generating comprehensive plot suite -> D:\Projects\Sleep\MAResNet_BiGRU\logs/
+2026-05-09 17:34:15 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/training_curves.png
+2026-05-09 17:34:16 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/confusion_matrix.png
+2026-05-09 17:34:16 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/confusion_matrix_counts.png
+2026-05-09 17:34:18 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/hypnogram_predicted.png
+2026-05-09 17:34:20 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/hypnogram_comparison.png
+2026-05-09 17:34:20 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/per_class_metrics.png
+2026-05-09 17:34:21 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/false_alarm_rates.png
+2026-05-09 17:34:21 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/metrics_radar.png
+2026-05-09 17:34:21 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/metrics_summary_table.png
+2026-05-09 17:34:22 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/roc_curves.png
+2026-05-09 17:34:22 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/confidence_distribution.png
+2026-05-09 17:34:23 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/stage_probabilities.png
+2026-05-09 17:34:24 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/class_distribution_true.png
+2026-05-09 17:34:24 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/class_distribution_pred.png
+2026-05-09 17:34:25 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/transition_matrix_pred.png
+2026-05-09 17:34:26 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/transition_matrix_true.png
+2026-05-09 17:34:32 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/feature_correlation.png
+2026-05-09 17:34:33 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/sleep_quality_gauge.png
+2026-05-09 17:34:35 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\MAResNet_BiGRU\logs/dashboard.png
+2026-05-09 17:34:35 [INFO] src.utils: All 19 plots saved to D:\Projects\Sleep\MAResNet_BiGRU\logs/
+2026-05-09 17:34:35 [INFO] __main__: Test accuracy 0.7998 | Kappa 0.7104 | Mean FAR 0.0712 | Sleep Quality 80.68
