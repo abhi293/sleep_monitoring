@@ -166,6 +166,9 @@ def build_model(
     l2_reg: float = 1e-4,
     focal_gamma: float = 2.0,
     class_weights: dict | None = None,
+    use_cnn: bool = True,
+    use_gru: bool = True,
+    use_lstm: bool = True,
 ) -> Model:
     """
     Build and compile the Hybrid CNN–GRU–LSTM model.
@@ -181,42 +184,55 @@ def build_model(
     -------
     Compiled tf.keras.Model
     """
+    if not any([use_cnn, use_gru, use_lstm]):
+        raise ValueError("At least one component must be enabled: CNN, GRU, or LSTM.")
+
     inp = Input(shape=(window_size, n_features), name="input_sequence")
 
     # ── CNN encoder ────────────────────────────────────────────
-    cnn = _conv_block(inp, cnn_filters_1, cnn_kernel_1, pool=False, l2_reg=l2_reg)
-    cnn = _residual_conv_block(cnn, cnn_filters_1, cnn_kernel_1, l2_reg=l2_reg)
-    cnn = _squeeze_excite(cnn)      # channel attention after first residual
-    cnn = _conv_block(cnn, cnn_filters_2, cnn_kernel_2, pool=True,  l2_reg=l2_reg)
-    cnn = _residual_conv_block(cnn, cnn_filters_2, cnn_kernel_2, l2_reg=l2_reg)
-    cnn = _squeeze_excite(cnn)      # channel attention after second residual
-    # cnn → [batch, T//2, cnn_filters_2]
+    if use_cnn:
+        cnn = _conv_block(inp, cnn_filters_1, cnn_kernel_1, pool=False, l2_reg=l2_reg)
+        cnn = _residual_conv_block(cnn, cnn_filters_1, cnn_kernel_1, l2_reg=l2_reg)
+        cnn = _squeeze_excite(cnn)      # channel attention after first residual
+        cnn = _conv_block(cnn, cnn_filters_2, cnn_kernel_2, pool=True,  l2_reg=l2_reg)
+        cnn = _residual_conv_block(cnn, cnn_filters_2, cnn_kernel_2, l2_reg=l2_reg)
+        cnn = _squeeze_excite(cnn)      # channel attention after second residual
+        sequence_features = cnn
+    else:
+        sequence_features = inp
+
+    pooled_branches = []
 
     # ── GRU branch (short-term disturbances) ───────────────────
-    gru_out = Bidirectional(
-        GRU(gru_units, return_sequences=True, dropout=0.1,
-            recurrent_dropout=0.0,
-            kernel_regularizer=l2(l2_reg)),
-        name="bidirectional_gru"
-    )(cnn)                                         # [B, T', 2*gru_units]
-    gru_out = LayerNormalization()(gru_out)
-    gru_pooled = GlobalAveragePooling1D(name="gru_pool")(gru_out)   # [B, 2*gru_units]
+    if use_gru:
+        gru_out = Bidirectional(
+            GRU(gru_units, return_sequences=True, dropout=0.1,
+                recurrent_dropout=0.0,
+                kernel_regularizer=l2(l2_reg)),
+            name="bidirectional_gru"
+        )(sequence_features)
+        gru_out = LayerNormalization()(gru_out)
+        pooled_branches.append(GlobalAveragePooling1D(name="gru_pool")(gru_out))
 
     # ── LSTM branch (long-term sleep cycles) ───────────────────
-    lstm_out = Bidirectional(
-        LSTM(lstm_units, return_sequences=True, dropout=0.1,
-             recurrent_dropout=0.0,
-             kernel_regularizer=l2(l2_reg)),
-        name="bidirectional_lstm"
-    )(cnn)                                         # [B, T', 2*lstm_units]
-    lstm_out = LayerNormalization()(lstm_out)
-    lstm_pooled = GlobalAveragePooling1D(name="lstm_pool")(lstm_out) # [B, 2*lstm_units]
+    if use_lstm:
+        lstm_out = Bidirectional(
+            LSTM(lstm_units, return_sequences=True, dropout=0.1,
+                 recurrent_dropout=0.0,
+                 kernel_regularizer=l2(l2_reg)),
+            name="bidirectional_lstm"
+        )(sequence_features)
+        lstm_out = LayerNormalization()(lstm_out)
+        pooled_branches.append(GlobalAveragePooling1D(name="lstm_pool")(lstm_out))
 
     # ── CNN global context ─────────────────────────────────────
-    cnn_pooled = GlobalAveragePooling1D(name="cnn_pool")(cnn)       # [B, cnn_filters_2]
+    if use_cnn:
+        pooled_branches.insert(0, GlobalAveragePooling1D(name="cnn_pool")(cnn))
+    elif not pooled_branches:
+        pooled_branches.append(GlobalAveragePooling1D(name="raw_pool")(inp))
 
     # ── Merge all branches ─────────────────────────────────────
-    merged = Concatenate(name="merge")([cnn_pooled, gru_pooled, lstm_pooled])
+    merged = pooled_branches[0] if len(pooled_branches) == 1 else Concatenate(name="merge")(pooled_branches)
     # merged → [B, cnn_filters_2 + 2*gru_units + 2*lstm_units]
 
     # ── Classification head ────────────────────────────────────
@@ -229,7 +245,14 @@ def build_model(
     x = Dropout(dropout * 0.5)(x)
     output = Dense(num_classes, activation="softmax", name="stage_output")(x)
 
-    model = Model(inputs=inp, outputs=output, name="SleepNet_CNN_GRU_LSTM")
+    enabled = []
+    if use_cnn:
+        enabled.append("CNN")
+    if use_gru:
+        enabled.append("GRU")
+    if use_lstm:
+        enabled.append("LSTM")
+    model = Model(inputs=inp, outputs=output, name="SleepNet_" + "_".join(enabled))
 
     optimizer = Adam(learning_rate=learning_rate, clipnorm=1.0)
 
@@ -265,6 +288,9 @@ def build_from_config(cfg: dict, window_size: int, n_features: int,
         dropout=float(cfg.get("dropout", 0.30)),
         learning_rate=float(cfg.get("learning_rate", 1e-3)),
         class_weights=class_weights,
+        use_cnn=bool(cfg.get("use_cnn", True)),
+        use_gru=bool(cfg.get("use_gru", True)),
+        use_lstm=bool(cfg.get("use_lstm", True)),
     )
 
 

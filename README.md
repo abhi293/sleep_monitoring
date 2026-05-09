@@ -68,6 +68,42 @@ src/                    # Source code
   - Evaluation metrics: `evaluation_results/mixed_dataset/user2/`
   - Training logs: `logs/training_log.csv`
 
+### Ablation Study CLI
+
+The original hybrid model can be trained without MOPSO while manually enabling or disabling CNN, GRU, and LSTM components from the CLI. Outputs are written to separate folders such as `logs/ablation_cnn_lstm/` and `checkpoints/ablation_cnn_lstm/`.
+
+```bash
+# CNN + LSTM only
+python train.py --no_config --without_gru --epochs 50
+
+# CNN + GRU only
+python train.py --no_config --without_lstm --epochs 50
+
+# Full CNN + GRU + LSTM without MOPSO
+python train.py --no_config --with_cnn --with_gru --with_lstm --epochs 50
+
+# Optional raw sequence baselines
+python train.py --no_config --without_cnn --with_gru --without_lstm --epochs 50
+python train.py --no_config --without_cnn --without_gru --with_lstm --epochs 50
+```
+
+By default, ablation runs use built-in model/training defaults instead of model hyperparameters from `configs/model_config.yaml`. Use `--use_config_model` only when you intentionally want the architecture/training hyperparameters from that YAML. Use `--merge_val_for_final` only when you intentionally want to merge train+validation and monitor on an internal split; otherwise validation remains the original held-out split.
+
+MOPSO is still opt-in through `--mopso`. You can also combine MOPSO with the same component toggles when you want optimized ablation variants:
+
+```bash
+# MOPSO-optimized CNN + LSTM
+python train.py --mopso --without_gru --mopso_iter 10 --mopso_particles 10 --epochs 50
+
+# MOPSO-optimized CNN + GRU
+python train.py --mopso --without_lstm --mopso_iter 10 --mopso_particles 10 --epochs 50
+
+# MOPSO-optimized full CNN + GRU + LSTM
+python train.py --mopso --with_cnn --with_gru --with_lstm --mopso_iter 10 --mopso_particles 10 --epochs 50
+```
+
+MOPSO outputs are written separately, for example `logs/mopso_cnn_lstm/` and `checkpoints/mopso_cnn_lstm/`.
+
 ## Technical Details
 - **Model architecture**: LSTM-based neural network (see `src/model.py`)
 - **Optimization**: Multi-objective PSO algorithm (see `src/mopso.py`)

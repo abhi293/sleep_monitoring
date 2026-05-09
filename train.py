@@ -64,6 +64,47 @@ from src.utils import (
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_MODEL_CFG = {
+    "num_classes": 4,
+    "cnn_filters_1": 32,
+    "cnn_filters_2": 64,
+    "cnn_kernel_1": 3,
+    "cnn_kernel_2": 3,
+    "gru_units": 32,
+    "lstm_units": 32,
+    "dense_units": 64,
+    "dropout": 0.40,
+    "focal_gamma": 1.5,
+}
+
+DEFAULT_TRAINING_CFG = {
+    "epochs": 50,
+    "batch_size": 128,
+    "learning_rate": 5e-4,
+    "lr_schedule": "reduce_on_plateau",
+    "early_stopping_patience": 8,
+    "class_weights": True,
+}
+
+DEFAULT_DATA_CFG = {
+    "dataset_path": "realistic_sleep_dataset_v4.csv",
+    "feature_cols": FEATURE_COLS,
+    "label_col": "Stage",
+    "window_size": 30,
+    "stride": 10,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15,
+    "random_seed": 42,
+}
+
+DEFAULT_MOPSO_CFG = {
+    "n_particles": 8,
+    "max_iter": 8,
+    "n_jobs": 1,
+    "quick_epochs": 3,
+    "pareto_dir": "mopso_results",
+}
+
 
 # ────────────────────────────────────────────────────────────────
 # Argument parser
@@ -75,6 +116,18 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument("--config",          default="configs/model_config.yaml",
                    help="Path to YAML config file")
+    p.add_argument("--no_config",       action="store_true",
+                   help="Do not load config YAML; use built-in standalone defaults.")
+    p.add_argument("--dataset_path",    default=None,
+                   help="Override dataset path")
+    p.add_argument("--window_size",     type=int, default=None,
+                   help="Override sliding-window size")
+    p.add_argument("--stride",          type=int, default=None,
+                   help="Override sliding-window stride")
+    p.add_argument("--log_dir",         default=None,
+                   help="Override base log directory")
+    p.add_argument("--checkpoint_dir",  default=None,
+                   help="Override base checkpoint directory")
     p.add_argument("--mopso",           action="store_true",
                    help="Run MOPSO optimisation before training")
     p.add_argument("--mopso_iter",      type=int, default=None,
@@ -92,6 +145,25 @@ def parse_args() -> argparse.Namespace:
                    help="Override training epochs")
     p.add_argument("--batch_size",      type=int, default=None,
                    help="Override batch size")
+    p.add_argument("--learning_rate",   type=float, default=None,
+                   help="Override learning rate")
+    p.add_argument("--use_config_model", action="store_true",
+                   help="Use model/training hyperparameters from --config. Default uses built-in ablation defaults.")
+    p.add_argument("--merge_val_for_final", action="store_true",
+                   help="Merge train+val and monitor on an internal split. Off by default for honest ablations.")
+    p.add_argument("--with_cnn",        dest="use_cnn", action="store_true",
+                   help="Enable CNN encoder branch")
+    p.add_argument("--without_cnn",     dest="use_cnn", action="store_false",
+                   help="Disable CNN encoder branch")
+    p.add_argument("--with_gru",        dest="use_gru", action="store_true",
+                   help="Enable GRU branch")
+    p.add_argument("--without_gru",     dest="use_gru", action="store_false",
+                   help="Disable GRU branch")
+    p.add_argument("--with_lstm",       dest="use_lstm", action="store_true",
+                   help="Enable LSTM branch")
+    p.add_argument("--without_lstm",    dest="use_lstm", action="store_false",
+                   help="Disable LSTM branch")
+    p.set_defaults(use_cnn=True, use_gru=True, use_lstm=True)
     return p.parse_args()
 
 
@@ -105,6 +177,32 @@ def load_config(path: str) -> dict:
     return cfg
 
 
+def default_config() -> dict:
+    return {
+        "data": DEFAULT_DATA_CFG.copy(),
+        "model": DEFAULT_MODEL_CFG.copy(),
+        "training": {
+            **DEFAULT_TRAINING_CFG,
+            "checkpoint_dir": "checkpoints",
+            "log_dir": "logs",
+        },
+        "mopso": DEFAULT_MOPSO_CFG.copy(),
+    }
+
+
+def ablation_variant(use_cnn: bool, use_gru: bool, use_lstm: bool) -> str:
+    parts = []
+    if use_cnn:
+        parts.append("cnn")
+    if use_gru:
+        parts.append("gru")
+    if use_lstm:
+        parts.append("lstm")
+    if not parts:
+        raise ValueError("At least one component must be enabled.")
+    return "_".join(parts)
+
+
 # ────────────────────────────────────────────────────────────────
 # Main
 # ────────────────────────────────────────────────────────────────
@@ -113,9 +211,32 @@ def main() -> None:
     args = parse_args()
 
     # ── Logging & TF setup ─────────────────────────────────────
-    cfg = load_config(args.config)
-    log_dir   = cfg["training"]["log_dir"]
-    ckpt_dir  = cfg["training"]["checkpoint_dir"]
+    cfg = default_config() if args.no_config else load_config(args.config)
+    variant = ablation_variant(args.use_cnn, args.use_gru, args.use_lstm)
+    if args.mopso and not args.use_config_model:
+        logger.warning("MOPSO requires a search/config space; enabling --use_config_model for this run.")
+        args.use_config_model = True
+
+    if args.dataset_path is not None:
+        cfg["data"]["dataset_path"] = args.dataset_path
+    if args.window_size is not None:
+        cfg["data"]["window_size"] = args.window_size
+    if args.stride is not None:
+        cfg["data"]["stride"] = args.stride
+    if args.log_dir is not None:
+        cfg["training"]["log_dir"] = args.log_dir
+    if args.checkpoint_dir is not None:
+        cfg["training"]["checkpoint_dir"] = args.checkpoint_dir
+
+    base_log_dir = Path(cfg["training"]["log_dir"])
+    base_ckpt_dir = Path(cfg["training"]["checkpoint_dir"])
+    if args.mopso:
+        log_dir = str(base_log_dir / f"mopso_{variant}")
+        ckpt_dir = str(base_ckpt_dir / f"mopso_{variant}")
+        cfg["mopso"]["pareto_dir"] = str(Path(cfg["mopso"]["pareto_dir"]) / variant)
+    else:
+        log_dir = str(base_log_dir / f"ablation_{variant}")
+        ckpt_dir = str(base_ckpt_dir / f"ablation_{variant}")
     setup_logging(log_dir=log_dir)
 
     logging.getLogger("src.preprocessing").setLevel(logging.WARNING)
@@ -127,9 +248,20 @@ def main() -> None:
     logger.info("=" * 60)
     logger.info("  Sleep Intelligence System -- Training")
     logger.info("  TF version: %s  |  Cores: %d", tf.__version__, N_CORES)
+    logger.info("  Config source: %s", "built-in defaults (--no_config)" if args.no_config else args.config)
+    logger.info("  Ablation components: CNN=%s | GRU=%s | LSTM=%s | variant=%s",
+                args.use_cnn, args.use_gru, args.use_lstm, variant)
     logger.info("=" * 60)
 
     # ── Override config with CLI args ──────────────────────────
+    if not args.use_config_model:
+        cfg["model"] = DEFAULT_MODEL_CFG.copy()
+        cfg["training"].update(DEFAULT_TRAINING_CFG)
+        logger.info("Using built-in ablation model/training defaults; config model hyperparameters ignored.")
+    else:
+        source = "built-in defaults" if args.no_config else args.config
+        logger.info("Using model/training hyperparameters from %s", source)
+
     if args.smoke_test:
         cfg["training"]["epochs"] = 2
         cfg["training"]["batch_size"] = 256
@@ -143,6 +275,8 @@ def main() -> None:
         cfg["training"]["epochs"] = args.epochs
     if args.batch_size is not None:
         cfg["training"]["batch_size"] = args.batch_size
+    if args.learning_rate is not None:
+        cfg["training"]["learning_rate"] = args.learning_rate
 
     # ── Preprocessing ──────────────────────────────────────────
     t0 = time.time()
@@ -206,6 +340,9 @@ def main() -> None:
             **data,
             "df_train": df_tr_scaled,
             "df_val":   df_va_scaled,
+            "use_cnn": args.use_cnn,
+            "use_gru": args.use_gru,
+            "use_lstm": args.use_lstm,
         }
 
         n_iter      = args.mopso_iter      or cfg["mopso"]["max_iter"]
@@ -257,23 +394,28 @@ def main() -> None:
     # early-stopping signal.  Now that hyperparameters are fixed, merging
     # train+val gives the model 85 % of the dataset instead of 70 %.
     # The held-out test set (15 %) is never touched until final evaluation.
-    logger.info(
-        "Merging train+val for final training: %d + %d = %d windows",
-        len(X_train), len(X_val), len(X_train) + len(X_val),
-    )
-    X_train = np.concatenate([X_train, X_val], axis=0)
-    y_train = np.concatenate([y_train, y_val], axis=0)
-    # Shuffle the merged set
-    perm = np.random.default_rng(cfg["data"]["random_seed"]).permutation(len(X_train))
-    X_train, y_train = X_train[perm], y_train[perm]
-    # Recompute class weights on the merged labels
     from src.preprocessing import get_class_weights
-    if cfg["training"]["class_weights"]:
-        class_weights = get_class_weights(y_train, boost_minority=1.5)
-        logger.info("Recomputed class weights on merged set: %s", class_weights)
+    if args.merge_val_for_final:
+        logger.info(
+            "Merging train+val for final training: %d + %d = %d windows",
+            len(X_train), len(X_val), len(X_train) + len(X_val),
+        )
+        X_train = np.concatenate([X_train, X_val], axis=0)
+        y_train = np.concatenate([y_train, y_val], axis=0)
+        perm = np.random.default_rng(cfg["data"]["random_seed"]).permutation(len(X_train))
+        X_train, y_train = X_train[perm], y_train[perm]
+        if cfg["training"]["class_weights"]:
+            class_weights = get_class_weights(y_train, boost_minority=1.5)
+            logger.info("Recomputed class weights on merged set: %s", class_weights)
+    else:
+        logger.info("Keeping original validation split for ablation monitoring: train=%d val=%d",
+                    len(X_train), len(X_val))
 
     # Model creation ─────────────────────────────────────────
     logger.info("Stage 3/4 — Building model …")
+    model_cfg["use_cnn"] = args.use_cnn
+    model_cfg["use_gru"] = args.use_gru
+    model_cfg["use_lstm"] = args.use_lstm
     model = build_model(
         window_size=window_size,
         n_features=n_features,
@@ -289,6 +431,9 @@ def main() -> None:
         learning_rate=float(cfg["training"].get("learning_rate", 1e-3)),
         focal_gamma=float(model_cfg.get("focal_gamma", 2.0)),
         class_weights=class_weights,
+        use_cnn=args.use_cnn,
+        use_gru=args.use_gru,
+        use_lstm=args.use_lstm,
     )
     print_model_summary(model)
 
@@ -316,35 +461,31 @@ def main() -> None:
 
     bs = cfg["training"]["batch_size"]
 
-    # Carve out a small monitor set from the merged training data for
-    # early-stopping.  This keeps X_test fully blind until final evaluation,
-    # so the reported test metrics are unbiased.  We use a stratified 10 %
-    # hold-out (fixed seed for reproducibility).
-    _monitor_ratio = 0.10
-    _rng = np.random.default_rng(cfg["data"]["random_seed"] + 1)
-    _n_monitor = int(len(X_train) * _monitor_ratio)
-    # Stratified: sample proportionally from each class
-    _monitor_idx = []
-    for _cls in np.unique(y_train):
-        _cls_idx = np.where(y_train == _cls)[0]
-        _n = max(1, int(len(_cls_idx) * _monitor_ratio))
-        _monitor_idx.extend(_rng.choice(_cls_idx, size=_n, replace=False).tolist())
-    _monitor_idx = np.array(_monitor_idx)
-    _train_mask = np.ones(len(X_train), dtype=bool)
-    _train_mask[_monitor_idx] = False
+    if args.merge_val_for_final:
+        _monitor_ratio = 0.10
+        _rng = np.random.default_rng(cfg["data"]["random_seed"] + 1)
+        _monitor_idx = []
+        for _cls in np.unique(y_train):
+            _cls_idx = np.where(y_train == _cls)[0]
+            _n = max(1, int(len(_cls_idx) * _monitor_ratio))
+            _monitor_idx.extend(_rng.choice(_cls_idx, size=_n, replace=False).tolist())
+        _monitor_idx = np.array(_monitor_idx)
+        _train_mask = np.ones(len(X_train), dtype=bool)
+        _train_mask[_monitor_idx] = False
 
-    X_monitor, y_monitor = X_train[_monitor_idx], y_train[_monitor_idx]
-    X_train_fit, y_train_fit = X_train[_train_mask], y_train[_train_mask]
-
-    logger.info(
-        "Monitor split: %d train / %d monitor (%.0f%% hold-out from merged set)",
-        len(X_train_fit), len(X_monitor), _monitor_ratio * 100,
-    )
+        X_train_fit, y_train_fit = X_train[_train_mask], y_train[_train_mask]
+        X_monitor, y_monitor = X_train[_monitor_idx], y_train[_monitor_idx]
+        logger.info(
+            "Monitor split: %d train / %d monitor (%.0f%% hold-out from merged set)",
+            len(X_train_fit), len(X_monitor), _monitor_ratio * 100,
+        )
+        val_ds = make_tf_dataset(X_monitor, y_monitor, bs, shuffle=True, buffer=len(X_monitor))
+    else:
+        X_train_fit, y_train_fit = X_train, y_train
+        logger.info("Using original validation set for monitoring: %d windows", len(X_val))
+        val_ds = make_tf_dataset(X_val, y_val, bs, shuffle=False)
 
     train_ds = make_tf_dataset(X_train_fit, y_train_fit, bs, shuffle=True)
-    # Shuffle monitor set so temporal ordering doesn't cause oscillating
-    # per-epoch accuracy (sleep stages are temporally autocorrelated).
-    val_ds   = make_tf_dataset(X_monitor,   y_monitor,   bs, shuffle=True, buffer=len(X_monitor))
 
     t_train = time.time()
     history = model.fit(
@@ -375,6 +516,10 @@ def main() -> None:
 
     metrics = compute_metrics(y_test, y_pred, data["stage_names"])
     metrics["training_time_sec"] = round(train_time, 2)
+    metrics["ablation_variant"] = variant
+    metrics["use_cnn"] = bool(args.use_cnn)
+    metrics["use_gru"] = bool(args.use_gru)
+    metrics["use_lstm"] = bool(args.use_lstm)
 
     # Recovery & quality score
     # Use SVM (movement) proxy as a stand-in for RMSSD if not segmented

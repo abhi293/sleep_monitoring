@@ -163,7 +163,13 @@ def _evaluate_candidate(
     if len(X_tr) == 0 or len(X_va) == 0:
         return 1.0, 1.0, 6.0
 
-    cfg = {**hyperparams, "num_classes": 4}
+    cfg = {
+        **hyperparams,
+        "num_classes": 4,
+        "use_cnn": bool(data.get("use_cnn", True)),
+        "use_gru": bool(data.get("use_gru", True)),
+        "use_lstm": bool(data.get("use_lstm", True)),
+    }
     model = build_from_config(cfg, window_size, n_features,
                               class_weights=data.get("class_weights"))
 
