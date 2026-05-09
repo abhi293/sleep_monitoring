@@ -1,0 +1,84 @@
+2026-05-09 17:08:48 [INFO] __main__: Training cnn_transformer with TensorFlow 2.20.0
+2026-05-09 17:08:48 [INFO] __main__: Dataset: D:\Projects\Sleep\CNN_BiLSTM_Transformer\test_new.csv
+2026-05-09 17:08:48 [INFO] __main__: Standalone defaults only. No config file and no optimizer-search path are used.
+2026-05-09 17:08:48 [INFO] __main__: Window size=30 stride=10 loss=ce class_weights=False
+2026-05-09 17:08:54 [INFO] __main__: Data ready in 6.3s: train=(7570, 30, 28) val=(1630, 30, 28) test=(1644, 30, 28) class_weights=None
+2026-05-09 17:11:08 [INFO] src.utils: Metrics saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer\test_metrics.json
+2026-05-09 17:11:08 [INFO] src.utils: Generating comprehensive plot suite -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/
+2026-05-09 17:11:09 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/training_curves.png
+2026-05-09 17:11:09 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/confusion_matrix.png
+2026-05-09 17:11:10 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/confusion_matrix_counts.png
+2026-05-09 17:11:11 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/hypnogram_predicted.png
+2026-05-09 17:11:13 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/hypnogram_comparison.png
+2026-05-09 17:11:13 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/per_class_metrics.png
+2026-05-09 17:11:13 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/false_alarm_rates.png
+2026-05-09 17:11:14 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/metrics_radar.png
+2026-05-09 17:11:14 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/metrics_summary_table.png
+2026-05-09 17:11:15 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/roc_curves.png
+2026-05-09 17:11:16 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/confidence_distribution.png
+2026-05-09 17:11:18 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/stage_probabilities.png
+2026-05-09 17:11:19 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/class_distribution_true.png
+2026-05-09 17:11:19 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/class_distribution_pred.png
+2026-05-09 17:11:21 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/transition_matrix_pred.png
+2026-05-09 17:11:22 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/transition_matrix_true.png
+2026-05-09 17:11:33 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/feature_correlation.png
+2026-05-09 17:11:33 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/sleep_quality_gauge.png
+2026-05-09 17:11:37 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/dashboard.png
+2026-05-09 17:11:37 [INFO] src.utils: All 19 plots saved to D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/
+2026-05-09 17:11:37 [INFO] __main__: Test accuracy 0.8741 | Kappa 0.8029 | Mean FAR 0.0544 | Sleep Quality 85.87
+2026-05-09 17:13:27 [INFO] __main__: Training cnn_transformer with TensorFlow 2.20.0
+2026-05-09 17:13:27 [INFO] __main__: Dataset: D:\Projects\Sleep\CNN_BiLSTM_Transformer\test_new.csv
+2026-05-09 17:13:27 [INFO] __main__: Standalone defaults only. No config file and no optimizer-search path are used.
+2026-05-09 17:13:27 [INFO] __main__: Window size=30 stride=20 loss=ce class_weights=False
+2026-05-09 17:13:32 [INFO] __main__: Data ready in 5.6s: train=(3837, 30, 28) val=(828, 30, 28) test=(835, 30, 28) class_weights=None
+2026-05-09 17:14:09 [INFO] src.utils: Metrics saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer\test_metrics.json
+2026-05-09 17:14:09 [INFO] src.utils: Generating comprehensive plot suite -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/
+2026-05-09 17:14:10 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/training_curves.png
+2026-05-09 17:14:11 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/confusion_matrix.png
+2026-05-09 17:14:12 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/confusion_matrix_counts.png
+2026-05-09 17:14:13 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/hypnogram_predicted.png
+2026-05-09 17:14:16 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/hypnogram_comparison.png
+2026-05-09 17:14:17 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/per_class_metrics.png
+2026-05-09 17:14:17 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/false_alarm_rates.png
+2026-05-09 17:14:18 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/metrics_radar.png
+2026-05-09 17:14:18 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/metrics_summary_table.png
+2026-05-09 17:14:19 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/roc_curves.png
+2026-05-09 17:14:19 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/confidence_distribution.png
+2026-05-09 17:14:22 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/stage_probabilities.png
+2026-05-09 17:14:22 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/class_distribution_true.png
+2026-05-09 17:14:23 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/class_distribution_pred.png
+2026-05-09 17:14:25 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/transition_matrix_pred.png
+2026-05-09 17:14:26 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/transition_matrix_true.png
+2026-05-09 17:14:34 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/feature_correlation.png
+2026-05-09 17:14:34 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/sleep_quality_gauge.png
+2026-05-09 17:14:37 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/dashboard.png
+2026-05-09 17:14:37 [INFO] src.utils: All 19 plots saved to D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/
+2026-05-09 17:14:37 [INFO] __main__: Test accuracy 0.4898 | Kappa 0.3479 | Mean FAR 0.1626 | Sleep Quality 56.35
+2026-05-09 17:15:58 [INFO] __main__: Training cnn_transformer with TensorFlow 2.20.0
+2026-05-09 17:15:58 [INFO] __main__: Dataset: D:\Projects\Sleep\CNN_BiLSTM_Transformer\test_new.csv
+2026-05-09 17:15:58 [INFO] __main__: Standalone defaults only. No config file and no optimizer-search path are used.
+2026-05-09 17:15:58 [INFO] __main__: Window size=30 stride=20 loss=ce class_weights=False
+2026-05-09 17:16:07 [INFO] __main__: Data ready in 9.0s: train=(6157, 30, 28) val=(1177, 30, 28) test=(1164, 30, 28) class_weights=None
+2026-05-09 17:18:32 [INFO] src.utils: Metrics saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer\test_metrics.json
+2026-05-09 17:18:32 [INFO] src.utils: Generating comprehensive plot suite -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/
+2026-05-09 17:18:33 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/training_curves.png
+2026-05-09 17:18:34 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/confusion_matrix.png
+2026-05-09 17:18:36 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/confusion_matrix_counts.png
+2026-05-09 17:18:38 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/hypnogram_predicted.png
+2026-05-09 17:18:41 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/hypnogram_comparison.png
+2026-05-09 17:18:42 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/per_class_metrics.png
+2026-05-09 17:18:43 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/false_alarm_rates.png
+2026-05-09 17:18:43 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/metrics_radar.png
+2026-05-09 17:18:43 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/metrics_summary_table.png
+2026-05-09 17:18:44 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/roc_curves.png
+2026-05-09 17:18:44 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/confidence_distribution.png
+2026-05-09 17:18:46 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/stage_probabilities.png
+2026-05-09 17:18:46 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/class_distribution_true.png
+2026-05-09 17:18:46 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/class_distribution_pred.png
+2026-05-09 17:18:47 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/transition_matrix_pred.png
+2026-05-09 17:18:48 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/transition_matrix_true.png
+2026-05-09 17:18:57 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/feature_correlation.png
+2026-05-09 17:18:57 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/sleep_quality_gauge.png
+2026-05-09 17:19:00 [INFO] src.utils: Plot saved -> D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/dashboard.png
+2026-05-09 17:19:00 [INFO] src.utils: All 19 plots saved to D:\Projects\Sleep\CNN_BiLSTM_Transformer\logs\cnn_transformer/
+2026-05-09 17:19:00 [INFO] __main__: Test accuracy 0.7165 | Kappa 0.5780 | Mean FAR 0.1109 | Sleep Quality 73.15
