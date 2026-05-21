@@ -112,7 +112,25 @@ DEFAULT_MOPSO_CFG = {
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="Train Hybrid CNN–GRU–LSTM Sleep Intelligence Model"
+        description="Train Hybrid CNN–GRU–LSTM Sleep Intelligence Model",
+        epilog="""
+MOPSO & Config Control:
+  --mopso: Run MOPSO optimization (generates new config from optimization)
+  --use_config_model: Load model/training hyperparams from YAML (only when --mopso not used)
+  
+Examples:
+  # Ablation with built-in defaults (recommended for clean ablations)
+  python train.py --without_gru
+  
+  # Ablation with custom data windowing
+  python train.py --window_size 25 --stride 5 --with_lstm --without_gru
+  
+  # Run MOPSO optimization (generates new config)
+  python train.py --mopso --mopso_iter 15 --mopso_particles 12
+  
+  # Use existing YAML config (e.g., after MOPSO has run once)
+  python train.py --use_config_model --with_lstm
+        """
     )
     p.add_argument("--config",          default="configs/model_config.yaml",
                    help="Path to YAML config file")
@@ -121,15 +139,15 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--dataset_path",    default=None,
                    help="Override dataset path")
     p.add_argument("--window_size",     type=int, default=None,
-                   help="Override sliding-window size")
+                   help="Override sliding-window size (default: 30 for ablations, 20 if --use_config_model)")
     p.add_argument("--stride",          type=int, default=None,
-                   help="Override sliding-window stride")
+                   help="Override sliding-window stride (default: 10 for ablations, 3 if --use_config_model)")
     p.add_argument("--log_dir",         default=None,
                    help="Override base log directory")
     p.add_argument("--checkpoint_dir",  default=None,
                    help="Override base checkpoint directory")
     p.add_argument("--mopso",           action="store_true",
-                   help="Run MOPSO optimisation before training")
+                   help="Run MOPSO hyperparameter optimization before training")
     p.add_argument("--mopso_iter",      type=int, default=None,
                    help="Override max MOPSO iterations")
     p.add_argument("--mopso_particles", type=int, default=None,
@@ -148,7 +166,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--learning_rate",   type=float, default=None,
                    help="Override learning rate")
     p.add_argument("--use_config_model", action="store_true",
-                   help="Use model/training hyperparameters from --config. Default uses built-in ablation defaults.")
+                   help="Use model/training hyperparameters from YAML. "
+                        "Ignored if --mopso is specified. Default for ablations: built-in defaults.")
     p.add_argument("--merge_val_for_final", action="store_true",
                    help="Merge train+val and monitor on an internal split. Off by default for honest ablations.")
     p.add_argument("--with_cnn",        dest="use_cnn", action="store_true",
@@ -213,16 +232,47 @@ def main() -> None:
     # ── Logging & TF setup ─────────────────────────────────────
     cfg = default_config() if args.no_config else load_config(args.config)
     variant = ablation_variant(args.use_cnn, args.use_gru, args.use_lstm)
-    if args.mopso and not args.use_config_model:
-        logger.warning("MOPSO requires a search/config space; enabling --use_config_model for this run.")
-        args.use_config_model = True
+    
+    # ── Determine config usage mode ────────────────────────────
+    # KEY LOGIC:
+    # 1. If --mopso: Ignore --use_config_model, will run MOPSO and use those results
+    # 2. If NOT --mopso and --use_config_model: Use YAML config
+    # 3. If NOT --mopso and NOT --use_config_model: Use built-in ablation defaults
+    
+    use_yaml_config = (not args.mopso) and args.use_config_model
+    use_ablation_defaults = (not args.mopso) and (not args.use_config_model)
+    
+    # Set sensible defaults for data windowing based on mode
+    # For ablations, use larger window/stride to minimize data leakage
+    # For YAML config mode, use what's in the YAML (allow explicit windowing control)
+    if use_ablation_defaults:
+        # Ablation mode: use conservative windowing to avoid data leakage
+        default_window_size = 30
+        default_stride = 10
+    elif use_yaml_config:
+        # YAML mode: use what's configured in YAML
+        default_window_size = cfg["data"].get("window_size", 20)
+        default_stride = cfg["data"].get("stride", 3)
+    else:
+        # MOPSO mode: will be determined during MOPSO
+        default_window_size = cfg["data"].get("window_size", 20)
+        default_stride = cfg["data"].get("stride", 3)
+    
+    # Apply overrides from CLI (CLI always takes precedence)
+    if args.window_size is not None:
+        cfg["data"]["window_size"] = args.window_size
+    elif use_ablation_defaults:
+        # Only set ablation defaults if not already set
+        cfg["data"]["window_size"] = default_window_size
+        
+    if args.stride is not None:
+        cfg["data"]["stride"] = args.stride
+    elif use_ablation_defaults:
+        # Only set ablation defaults if not already set
+        cfg["data"]["stride"] = default_stride
 
     if args.dataset_path is not None:
         cfg["data"]["dataset_path"] = args.dataset_path
-    if args.window_size is not None:
-        cfg["data"]["window_size"] = args.window_size
-    if args.stride is not None:
-        cfg["data"]["stride"] = args.stride
     if args.log_dir is not None:
         cfg["training"]["log_dir"] = args.log_dir
     if args.checkpoint_dir is not None:
@@ -245,23 +295,28 @@ def main() -> None:
     tf.config.threading.set_intra_op_parallelism_threads(N_CORES)
     tf.config.threading.set_inter_op_parallelism_threads(N_CORES)
 
-    logger.info("=" * 60)
+    logger.info("=" * 80)
     logger.info("  Sleep Intelligence System -- Training")
     logger.info("  TF version: %s  |  Cores: %d", tf.__version__, N_CORES)
-    logger.info("  Config source: %s", "built-in defaults (--no_config)" if args.no_config else args.config)
+    logger.info("  Config mode: %s", 
+                "MOPSO optimization" if args.mopso else 
+                ("YAML config" if use_yaml_config else "Ablation defaults"))
+    logger.info("  Data windowing: window_size=%d stride=%d", 
+                cfg["data"]["window_size"], cfg["data"]["stride"])
     logger.info("  Ablation components: CNN=%s | GRU=%s | LSTM=%s | variant=%s",
                 args.use_cnn, args.use_gru, args.use_lstm, variant)
-    logger.info("=" * 60)
+    logger.info("=" * 80)
 
-    # ── Override config with CLI args ──────────────────────────
-    if not args.use_config_model:
+    # ── Override model/training config based on mode ──────────
+    if use_ablation_defaults:
         cfg["model"] = DEFAULT_MODEL_CFG.copy()
         cfg["training"].update(DEFAULT_TRAINING_CFG)
-        logger.info("Using built-in ablation model/training defaults; config model hyperparameters ignored.")
-    else:
-        source = "built-in defaults" if args.no_config else args.config
-        logger.info("Using model/training hyperparameters from %s", source)
-
+        logger.info("[Ablation Mode] Using built-in model/training defaults.")
+    elif use_yaml_config:
+        logger.info("[YAML Config Mode] Using model/training hyperparameters from %s", args.config)
+    elif args.mopso:
+        logger.info("[MOPSO Mode] Will run optimization and use MOPSO-selected hyperparameters.")
+    
     if args.smoke_test:
         cfg["training"]["epochs"] = 2
         cfg["training"]["batch_size"] = 256
