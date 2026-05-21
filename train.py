@@ -159,11 +159,11 @@ Examples:
                    help="Load previous MOPSO results instead of re-running optimization")
     p.add_argument("--smoke_test",      action="store_true",
                    help="Quick 2-epoch test with reduced data")
-    p.add_argument("--epochs",          type=int, default=None,
+    p.add_argument("--epochs",          type=int, default=50,
                    help="Override training epochs")
-    p.add_argument("--batch_size",      type=int, default=None,
+    p.add_argument("--batch_size",      type=int, default=32,
                    help="Override batch size")
-    p.add_argument("--learning_rate",   type=float, default=None,
+    p.add_argument("--learning_rate",   type=float, default=1e-3,
                    help="Override learning rate")
     p.add_argument("--use_config_model", action="store_true",
                    help="Use model/training hyperparameters from YAML. "
