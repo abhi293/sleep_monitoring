@@ -31,13 +31,13 @@
       "precision": 0.9284177015575169,
       "recall": 0.9660929253645485,
       "f1-score": 0.9415498031560245,
-      "support": 2296.0
+      "support": 7478.0
     },
     "weighted avg": {
       "precision": 0.9582021059337762,
       "recall": 0.9442508710801394,
       "f1-score": 0.9471200907861842,
-      "support": 2296.0
+      "support": 7478.0
     }
   },
   "false_alarm_rate_per_class": {

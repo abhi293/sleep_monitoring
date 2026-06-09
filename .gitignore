@@ -3,3 +3,4 @@ venv/
 *.keras
 /*.pkl
 *.pkl
+Downloads/
