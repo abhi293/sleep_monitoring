@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sleep Health Monitor</title>
+<script>
+  /* Apply saved theme before first paint. Light is the default. */
+  try{
+    var t = localStorage.getItem('sleep-theme');
+    document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
+  }catch(e){}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font-ui:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --font-serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+
+  --bg:#EEF5F5;
+  --surface:#FFFFFF;
+  --surface-2:#E8F1F0;
+  --ink:#12303F;
+  --ink-2:#4B6673;
+  --line:#D3E2E2;
+  --brand:#0B7A82;
+
+  --ok:#1E8E6A;      --ok-bg:#DDF1E9;     --ok-ink:#126B4E;
+  --watch:#C98100;   --watch-bg:#FBEBCB;  --watch-ink:#8A5200;
+  --alert:#C23B3B;   --alert-bg:#FBE0DE;  --alert-ink:#A02828;
+
+  --grid:rgba(11,122,130,.10);
+  --grid-major:rgba(11,122,130,.22);
+  --zone:rgba(30,142,106,.38);
+
+  --stage-awake:#E8A317;
+  --stage-rem:#8571D1;
+  --stage-light:#4A9BE0;
+  --stage-deep:#1E9E78;
+
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1A21; --surface:#12262F; --surface-2:#183440; --ink:#E4F1F1; --ink-2:#9DB5BD; --line:#26444F; --brand:#4FC3C9;
+    --ok:#4FC9A0; --ok-bg:#12382D; --ok-ink:#6FE0B8;
+    --watch:#F0B04A; --watch-bg:#3A2D10; --watch-ink:#F5C677;
+    --alert:#F07575; --alert-bg:#3D1B1D; --alert-ink:#FF9C9C;
+    --grid:rgba(79,195,201,.10); --grid-major:rgba(79,195,201,.22); --zone:rgba(79,201,160,.40);
+    --stage-awake:#F0B04A; --stage-rem:#A494EA; --stage-light:#5FAEF0; --stage-deep:#3CC49A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1A21; --surface:#12262F; --surface-2:#183440; --ink:#E4F1F1; --ink-2:#9DB5BD; --line:#26444F; --brand:#4FC3C9;
+  --ok:#4FC9A0; --ok-bg:#12382D; --ok-ink:#6FE0B8;
+  --watch:#F0B04A; --watch-bg:#3A2D10; --watch-ink:#F5C677;
+  --alert:#F07575; --alert-bg:#3D1B1D; --alert-ink:#FF9C9C;
+  --grid:rgba(79,195,201,.10); --grid-major:rgba(79,195,201,.22); --zone:rgba(79,201,160,.40);
+  --stage-awake:#F0B04A; --stage-rem:#A494EA; --stage-light:#5FAEF0; --stage-deep:#3CC49A;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:1rem;line-height:1.45;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+h1,h2,h3,p,dl,dd{margin:0}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px;border-radius:4px}
+
+.app{max-width:1680px;margin:0 auto;padding:0 20px 28px}
+
+/* Top bar */
+.topbar{display:flex;align-items:center;gap:14px 28px;flex-wrap:wrap;padding:16px 0 12px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{width:34px;height:34px;flex:none}
+.brand h1{font-family:var(--font-serif);font-weight:600;font-size:1.35rem;letter-spacing:-.01em;white-space:nowrap}
+.patient{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:8px;padding:5px 16px}
+.patient dl{display:flex;flex-wrap:wrap;gap:2px 28px}
+.patient dt{font-size:.74rem;color:var(--ink-2);line-height:1.2}
+.patient dd{font-weight:700;font-size:.9rem;line-height:1.3;white-space:nowrap}
+.actions{display:flex;align-items:center;gap:14px;margin-left:auto}
+.sync{display:inline-flex;align-items:center;gap:8px;color:var(--ink-2);font-size:.88rem;white-space:nowrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--ok);flex:none}
+.sync.live .dot{animation:ping 1.8s ease-out infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 60%,transparent)}100%{box-shadow:0 0 0 9px transparent}}
+
+.switch{display:inline-flex;align-items:center;gap:9px;background:none;border:0;padding:4px;font:inherit;font-size:.9rem;color:var(--ink);cursor:pointer;white-space:nowrap}
+.switch .track{width:40px;height:24px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);position:relative;transition:background .2s}
+.switch .knob{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--ink-2);transition:transform .2s,background .2s}
+.switch[aria-checked="true"] .track{background:var(--ok-bg);border-color:var(--ok)}
+.switch[aria-checked="true"] .knob{transform:translateX(16px);background:var(--ok)}
+
+.theme-btn{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--line);color:var(--ink);cursor:pointer;padding:0}
+.theme-btn:hover{border-color:var(--brand);color:var(--brand)}
+.theme-btn svg{width:20px;height:20px}
+:root[data-theme="dark"] .i-moon{display:none}
+:root:not([data-theme="dark"]) .i-sun{display:none}
+
+/* Grid and cards */
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0;transition:background .25s,border-color .25s}
+.card h2{font-family:var(--font-serif);font-weight:600;font-size:1.1rem;line-height:1.25}
+.card .sub{color:var(--ink-2);font-size:.88rem;margin:2px 0 10px}
+.summary{grid-column:span 4}
+.hypno{grid-column:span 8}
+.notes{grid-column:span 12}
+.vital{grid-column:span 4}
+.body-card{grid-column:span 7}
+.room-card{grid-column:span 5}
+
+/* Summary */
+.score-row{display:flex;align-items:center;gap:16px;margin-top:8px}
+.ring{position:relative;width:104px;height:104px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .bg{stroke:var(--surface-2)}
+.ring .fg{stroke:var(--ok);transition:stroke-dashoffset 1.2s cubic-bezier(.2,.7,.2,1)}
+.ring .fg.watch{stroke:var(--watch)}
+.ring .fg.alert{stroke:var(--alert)}
+.ring .num{position:absolute;inset:0;display:grid;place-content:center;text-align:center;font-family:var(--font-serif);font-weight:600;font-size:2.1rem;line-height:1}
+.ring .num small{font-family:var(--font-ui);font-size:.7rem;font-weight:400;color:var(--ink-2);margin-top:3px}
+.verdict{font-family:var(--font-serif);font-weight:600;font-size:1.3rem;line-height:1.2}
+.verdict-sub{color:var(--ink-2);font-size:.9rem;margin-top:3px}
+.stack{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:16px 0 10px;background:var(--surface-2)}
+.stack span{display:block;height:100%}
+.stack span+span{border-left:2px solid var(--surface)}
+.split{display:grid;gap:4px;font-size:.9rem}
+.split div{display:flex;align-items:center;gap:10px}
+.split i{width:12px;height:12px;border-radius:3px;flex:none}
+.split b{margin-left:auto;font-variant-numeric:tabular-nums}
+
+/* Hypnogram */
+.hypno{display:flex;flex-direction:column}
+.hypno-wrap{position:relative;height:250px;flex:none}
+.hypno-wrap svg{position:absolute;left:0;top:0;display:block;overflow:visible}
+.hypno-wrap .hit{fill:transparent;cursor:crosshair}
+.hypno-wrap .hit:focus-visible{outline:none;stroke:var(--brand);stroke-width:2}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);padding:7px 11px;border-radius:8px;font-size:.84rem;line-height:1.35;white-space:nowrap;transform:translate(-50%,-100%);opacity:0;transition:opacity .12s;z-index:2}
+.tip.on{opacity:1}
+.tip b{display:block;font-size:.9rem}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:8px;font-size:.82rem;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.legend .band{background:color-mix(in srgb,var(--alert) 25%,transparent);border:1.5px solid var(--alert)}
+
+/* Notes */
+.note-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:10px}
+.note{border:1px solid var(--line);border-left:5px solid var(--ok);border-radius:8px;padding:5px 12px;display:grid;grid-template-columns:auto 1fr;gap:0 10px}
+.note svg{width:20px;height:20px;margin-top:1px}
+.note.watch{border-left-color:var(--watch)}
+.note.info{border-left-color:var(--brand)}
+.note .nh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;min-width:0}
+.note .nh h3{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note .tag{font-size:.72rem;font-weight:700;color:var(--ok-ink);line-height:1.2;white-space:nowrap}
+.note.watch .tag{color:var(--watch-ink)}
+.note.info .tag{color:var(--brand)}
+.note.ok svg{color:var(--ok)} .note.watch svg{color:var(--watch)} .note.info svg{color:var(--brand)}
+.note h3{font-size:.95rem;line-height:1.25}
+.note p{grid-column:2;color:var(--ink-2);font-size:.85rem;line-height:1.35}
+
+/* Vital cards */
+.vital-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.vital-mid{display:flex;align-items:center;gap:14px;margin-top:4px}
+.vital-mid>div:first-child{flex:none;min-width:128px}
+.big{font-size:2.3rem;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.big small{font-size:.95rem;font-weight:400;color:var(--ink-2);margin-left:5px}
+.vital-sub{color:var(--ink-2);font-size:.86rem}
+.aside{flex:1;min-width:0;color:var(--ink-2);font-size:.84rem;line-height:1.35;border-left:2px solid var(--line);padding-left:12px}
+#ecg{display:block;flex:1;min-width:0;width:100%;height:52px;border-radius:6px;background:var(--surface-2)}
+
+.chip{display:inline-flex;align-items:center;gap:6px;padding:1px 10px;border-radius:999px;font-size:.8rem;font-weight:700;background:var(--ok-bg);color:var(--ok-ink);white-space:nowrap}
+.chip.watch{background:var(--watch-bg);color:var(--watch-ink)}
+.chip.alert{background:var(--alert-bg);color:var(--alert-ink)}
+
+.range{position:relative;height:8px;border-radius:4px;background:var(--surface-2);margin:12px 0 6px}
+.range .zone{position:absolute;top:0;bottom:0;background:var(--zone);border-radius:4px}
+.range .marker{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:var(--ink);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--ink);transform:translate(-50%,-50%);transition:left .6s ease}
+.range.watch .marker{background:var(--watch);box-shadow:0 0 0 1px var(--watch)}
+.range.alert .marker{background:var(--alert);box-shadow:0 0 0 1px var(--alert)}
+.range-note{font-size:.78rem;color:var(--ink-2)}
+
+/* Tiles */
+.tiles{display:grid;gap:8px;margin-top:10px}
+.tiles.t3{grid-template-columns:repeat(3,1fr)}
+.tiles.t4{grid-template-columns:repeat(2,1fr)}
+.tile{border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--surface);min-width:0;display:flex;flex-direction:column;gap:2px}
+.t-name{font-weight:700;font-size:.88rem;line-height:1.25}
+.t-val{font-size:1.4rem;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap}
+.t-val small{font-size:.8rem;font-weight:400;color:var(--ink-2);margin-left:4px}
+.t-hint{color:var(--ink-2);font-size:.78rem;line-height:1.3}
+.tile .chip{align-self:flex-start;margin-top:2px}
+.tile .range{margin:8px 0 4px}
+
+footer{margin-top:14px;color:var(--ink-2);font-size:.82rem;display:flex;flex-wrap:wrap;gap:4px 22px;border-top:1px solid var(--line);padding-top:10px}
+
+/* ---------- One-screen layout for desktop (designed for 1366 × 768) ---------- */
+@media (min-width:1100px) and (min-height:560px){
+  html{font-size:15px;height:100%}
+  body{height:100%}
+  .app{height:100%;min-height:560px;padding:6px 16px 8px;display:flex;flex-direction:column}
+  .topbar{flex-wrap:nowrap;padding:2px 0 8px}
+  .grid{flex:1;min-height:0;gap:10px;grid-template-rows:auto minmax(0,1fr) auto}
+  .card{padding:12px 16px}
+  .card .sub{display:none}
+  .hypno .sub{display:block;margin:1px 0 4px}
+
+  .vital{grid-column:span 4;grid-row:1}
+  .summary{grid-column:span 3;grid-row:2;min-height:0;overflow:auto}
+  .hypno{grid-column:span 5;grid-row:2;min-height:0}
+  .notes{grid-column:span 4;grid-row:2;min-height:0;overflow:auto}
+  .body-card{grid-column:span 6;grid-row:3}
+  .room-card{grid-column:span 6;grid-row:3}
+
+  .hypno-wrap{flex:1;height:auto;min-height:120px}
+  .legend{margin-top:6px}
+
+  .ring{width:92px;height:92px}
+  .ring .num{font-size:1.9rem}
+  .score-row{margin-top:6px}
+  .stack{margin:12px 0 8px}
+
+  .note-list{grid-template-columns:1fr;gap:6px;margin-top:8px}
+  .note p{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+
+  .tiles.t4{grid-template-columns:repeat(4,1fr)}
+  .tiles{margin-top:8px;gap:6px}
+  .tile{padding:7px 10px}
+  .t-val{font-size:1.3rem}
+  .room-card .range-note{font-size:.72rem}
+  footer{margin-top:8px;padding-top:6px;font-size:.78rem;flex:none}
+}
+/* Slightly shorter windows: trim the optional text so everything still fits */
+@media (min-width:1100px) and (min-height:560px) and (max-height:719px){
+  .t-hint:not(.keep){display:none}
+  .ring{width:66px;height:66px}
+  .ring .num{font-size:1.4rem}
+  .ring .num small{display:none}
+  .verdict{font-size:1.15rem}
+  .big{font-size:2rem}
+  #ecg{height:44px}
+  .legend{display:none}
+  .verdict-sub{display:none}
+  .stack{margin:8px 0 6px}
+  .split{gap:2px;font-size:.84rem}
+  .score-row{margin-top:2px}
+  .vital-mid>div:first-child{min-width:120px}
+  .range{margin:8px 0 4px}
+  .card{padding:10px 14px}
+  .hypno .sub{display:none}
+  .stack{display:none}
+  .split{margin-top:8px}
+  .note p{display:none}
+  .note{padding:3px 12px}
+  .note h3{font-size:.9rem}
+  .note-list{gap:4px;margin-top:5px}
+}
+
+@media (max-width:1099px){
+  .summary,.hypno,.body-card,.room-card{grid-column:span 12}
+  .vital{grid-column:span 4}
+  .actions{margin-left:0}
+}
+@media (max-width:760px){
+  .vital{grid-column:span 12}
+  .app{padding:0 14px 28px}
+  .tiles.t3{grid-template-columns:repeat(2,1fr)}
+  .tiles.t4{grid-template-columns:repeat(2,1fr)}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <rect width="40" height="40" rx="10" fill="var(--brand)"/>
+        <circle cx="19" cy="17" r="9" fill="#fff"/>
+        <circle cx="23.5" cy="14" r="8" fill="var(--brand)"/>
+        <path d="M7 32h7l2-4 3 8 3-10 2 6h9" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1>Sleep Health Monitor</h1>
+    </div>
+    <section class="patient" aria-label="Patient details">
+      <dl>
+        <div><dt>Patient</dt><dd>User 1</dd></div>
+        <div><dt>Age</dt><dd>31 years</dd></div>
+        <div><dt>Night</dt><dd>2–3 March 2026</dd></div>
+        <div><dt>Analysis</dt><dd>CNN-GRU-LSTM, on this device</dd></div>
+      </dl>
+    </section>
+    <div class="actions">
+      <span class="sync" id="sync" role="status"><i class="dot"></i><span id="syncText">Synced just now</span></span>
+      <button class="switch" id="liveToggle" role="switch" aria-checked="false">
+        <span class="track"><span class="knob"></span></span><span>Live demo</span>
+      </button>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="grid">
+
+    <section class="card summary" aria-labelledby="sum-h">
+      <h2 id="sum-h">Sleep quality</h2>
+      <div class="score-row">
+        <div class="ring" role="img" id="ringWrap" aria-label="Sleep quality score">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="bg" cx="60" cy="60" r="52" fill="none" stroke-width="11"/>
+            <circle class="fg" id="ringFg" cx="60" cy="60" r="52" fill="none" stroke-width="11" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
+          </svg>
+          <div class="num"><span id="scoreNum">89</span><small>out of 100</small></div>
+        </div>
+        <div>
+          <p class="verdict" id="verdict">Restful night</p>
+          <p class="verdict-sub" id="verdictSub"></p>
+        </div>
+      </div>
+      <div class="stack" id="stack" role="img" aria-label="Sleep stage breakdown"></div>
+      <div class="split" id="split"></div>
+    </section>
+
+    <section class="card hypno" aria-labelledby="hyp-h">
+      <h2 id="hyp-h">Sleep stages, last 4 hours</h2>
+      <p class="sub">Each step is 15 minutes. Hover or tab to a step for details.</p>
+      <div class="hypno-wrap" id="hypno"><div class="tip" id="tip" role="presentation"></div></div>
+      <div class="legend" aria-hidden="true">
+        <span><i style="background:var(--stage-awake)"></i>Awake</span>
+        <span><i style="background:var(--stage-rem)"></i>REM</span>
+        <span><i style="background:var(--stage-light)"></i>Light</span>
+        <span><i style="background:var(--stage-deep)"></i>Deep</span>
+        <span><i class="band"></i>Apnea event</span>
+      </div>
+    </section>
+
+    <section class="card notes" aria-labelledby="notes-h">
+      <h2 id="notes-h">What stood out tonight</h2>
+      <p class="sub">Plain-language notes based on the readings.</p>
+      <div class="note-list" id="noteList"></div>
+    </section>
+
+    <article class="card vital" id="v-hr">
+      <div class="vital-head"><h2>Heart rate</h2><span class="chip" data-chip></span></div>
+      <div class="vital-mid">
+        <div><div class="big"><span data-val></span><small>bpm</small></div><p class="vital-sub" data-sub></p></div>
+        <canvas id="ecg" aria-hidden="true"></canvas>
+      </div>
+      <div data-range></div>
+    </article>
+
+    <article class="card vital" id="v-spo2">
+      <div class="vital-head"><h2>Blood oxygen</h2><span class="chip" data-chip></span></div>
+      <div class="vital-mid">
+        <div><div class="big"><span data-val></span><small>%</small></div><p class="vital-sub" data-sub></p></div>
+        <p class="aside">Share of your blood carrying oxygen. Healthy is 95% or higher.</p>
+      </div>
+      <div data-range></div>
+    </article>
+
+    <article class="card vital" id="v-resp">
+      <div class="vital-head"><h2>Respiratory rate</h2><span class="chip" data-chip></span></div>
+      <div class="vital-mid">
+        <div><div class="big"><span data-val></span><small>/min</small></div><p class="vital-sub" data-sub></p></div>
+        <p class="aside">Breaths you take each minute. Most adults sit between 12 and 20.</p>
+      </div>
+      <div data-range></div>
+    </article>
+
+    <section class="card body-card" aria-labelledby="body-h">
+      <h2 id="body-h">Body and movement</h2>
+      <div class="tiles t3" id="bodyRows"></div>
+    </section>
+
+    <section class="card room-card" aria-labelledby="room-h">
+      <h2 id="room-h">Bedroom environment</h2>
+      <div class="tiles t4" id="roomRows"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>Readings are sensor data and model estimates, not a medical diagnosis.</span>
+    <span>Talk to a doctor if you have health concerns.</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s, r){ return (r || document).querySelector(s); };
+
+  /* ---------- Data (replace with your live feed via window.updateSleepDashboard) ---------- */
+  var SNAPSHOT = {
+    score: 89,
+    deep: 42,
+    rem: 28,
+    // R = REM, L = Light, D = Deep, A = Awake, X = Apnea event. One letter per 15 minutes.
+    stages: "RRRLLXLLLRRRDDDA",
+    vitals: { hr: { value: 77, baseline: 79 }, spo2: 97.5, resp: 14.4 },
+    body:   { hrv: 41.2, hrStability: 6.8, temp: 36.9, movement: 0.036, skin: 3.83, apnea: 1 },
+    room:   { temp: 21.5, humidity: 51.8, light: 267, noise: 30.5 }
+  };
+  var data = clone(SNAPSHOT);
+  function clone(o){ return JSON.parse(JSON.stringify(o)); }
+
+  /* ---------- Reference ranges ---------- */
+  var SPEC = {
+    hr:       {min:40, max:120, lo:50,  hi:90,  dec:0, unit:'bpm',  zone:'Typical range 50–90 bpm',  labels:{ok:'Typical range', low:'Below typical', high:'Above typical'}},
+    spo2:     {min:85, max:100, lo:95,  hi:100, dec:1, unit:'%',    zone:'Normal range 95–100%',     labels:{ok:'Normal range',  low:'Below normal',  high:'Normal range'}},
+    resp:     {min:6,  max:30,  lo:12,  hi:20,  dec:1, unit:'/min', zone:'Typical range 12–20 per minute', labels:{ok:'Steady', low:'Slow', high:'Fast'}},
+    temp:     {min:35, max:38,  lo:36.1,hi:37.2,dec:1, unit:'°C',   zone:'Normal range 36.1–37.2 °C', labels:{ok:'Normal', low:'Low', high:'Elevated'}},
+    rtemp:    {min:10, max:32,  lo:17,  hi:22,  dec:1, unit:'°C',   zone:'Comfortable 17–22 °C',      labels:{ok:'Comfortable', low:'Cool', high:'Warm'}},
+    humidity: {min:20, max:80,  lo:40,  hi:60,  dec:1, unit:'%',    zone:'Comfortable 40–60%',        labels:{ok:'Comfortable', low:'Dry', high:'Humid'}},
+    light:    {min:0,  max:400, lo:0,   hi:10,  dec:0, unit:'lux',  zone:'Best under 10 lux',         labels:{ok:'Dark', low:'Dark', high:'Bright for sleep'}, lowOk:true},
+    noise:    {min:20, max:70,  lo:20,  hi:35,  dec:1, unit:'dB',   zone:'Quiet is under 35 dB',      labels:{ok:'Quiet', low:'Quiet', high:'Noisy'}, lowOk:true}
+  };
+  function fmt(v, d){ return Number(v).toFixed(d); }
+  function status(k, v){
+    var s = SPEC[k], st = 'ok', label = s.labels.ok;
+    if (v < s.lo && !s.lowOk){ st = 'watch'; label = s.labels.low; }
+    if (v > s.hi){ st = 'watch'; label = s.labels.high; }
+    if (k === 'spo2' && v < 92) st = 'alert';
+    return {st: st, label: label};
+  }
+  function chipInner(st, label){ return '<span aria-hidden="true">' + (st === 'ok' ? '✓' : '!') + '</span>' + label; }
+  function chipHtml(st, label){ return '<span class="chip ' + (st === 'ok' ? '' : st) + '">' + chipInner(st, label) + '</span>'; }
+  function rangeBar(k, v, st){
+    var s = SPEC[k];
+    var p = function(x){ return Math.max(0, Math.min(100, (x - s.min) / (s.max - s.min) * 100)); };
+    var zl = p(s.lo), zr = p(s.hi);
+    return '<div class="range ' + st + '" role="img" aria-label="' + fmt(v, s.dec) + ' ' + s.unit + '. ' + s.zone + '">' +
+           '<span class="zone" style="left:' + zl + '%;width:' + (zr - zl) + '%"></span>' +
+           '<span class="marker" style="left:' + p(v) + '%"></span></div>' +
+           '<div class="range-note">' + s.zone + '</div>';
+  }
+
+  /* ---------- Vitals ---------- */
+  var bpm = 77;
+  function fillVital(id, k, v, sub){
+    var el = $('#' + id), s = SPEC[k], r = status(k, v);
+    $('[data-val]', el).textContent = fmt(v, s.dec);
+    var c = $('[data-chip]', el);
+    c.className = 'chip ' + (r.st === 'ok' ? '' : r.st);
+    c.innerHTML = chipInner(r.st, r.label);
+    $('[data-sub]', el).textContent = sub;
+    $('[data-range]', el).innerHTML = rangeBar(k, v, r.st);
+  }
+  function renderVitals(){
+    var h = data.vitals, diff = Math.round(h.hr.value - h.hr.baseline);
+    var sub = diff === 0 ? 'At your baseline'
+            : (diff < 0 ? '▼ ' : '▲ ') + Math.abs(diff) + ' bpm ' + (diff < 0 ? 'below' : 'above') + ' baseline';
+    fillVital('v-hr', 'hr', h.hr.value, sub);
+    fillVital('v-spo2', 'spo2', h.spo2, 'Oxygen saturation');
+    fillVital('v-resp', 'resp', h.resp, 'While asleep');
+    bpm = h.hr.value;
+  }
+
+  /* ---------- Tiles ---------- */
+  function tile(name, hint, valHtml, extra, keepHint){
+    return '<div class="tile" title="' + (hint || '').replace(/<[^>]*>/g, '') + '"><div class="t-name">' + name + '</div><div class="t-val">' + valHtml + '</div>' +
+           (hint ? '<div class="t-hint' + (keepHint ? ' keep' : '') + '">' + hint + '</div>' : '') + (extra || '') + '</div>';
+  }
+  function roomTile(name, k, v){
+    var s = SPEC[k], r = status(k, v);
+    return '<div class="tile"><div class="t-name">' + name + '</div><div class="t-val">' + fmt(v, s.dec) + '<small>' + s.unit + '</small></div>' +
+           chipHtml(r.st, r.label) + rangeBar(k, v, r.st) + '</div>';
+  }
+  function renderBody(){
+    var b = data.body, t = status('temp', b.temp);
+    var apnea = b.apnea > 0 ? chipHtml('watch', 'Worth a look') : chipHtml('ok', 'None');
+    $('#bodyRows').innerHTML =
+      tile('HRV (RMSSD)', 'Higher means better recovery', fmt(b.hrv, 1) + '<small>ms</small>') +
+      tile('HR stability', 'Heart rate steadiness', fmt(b.hrStability, 1)) +
+      tile('Body temperature', chipHtml(t.st, t.label), fmt(b.temp, 1) + '<small>°C</small>', '', true) +
+      tile('Movement', 'Tossing and turning', fmt(b.movement, 3)) +
+      tile('Skin conductance', 'Sweat-gland activity', fmt(b.skin, 2) + '<small>µS</small>') +
+      tile('Apnea events', apnea, b.apnea > 0 ? b.apnea + ' detected' : '0 detected', '', true);
+  }
+  function renderRoom(){
+    var r = data.room;
+    $('#roomRows').innerHTML =
+      roomTile('Temperature', 'rtemp', r.temp) +
+      roomTile('Humidity', 'humidity', r.humidity) +
+      roomTile('Light exposure', 'light', r.light) +
+      roomTile('Noise level', 'noise', r.noise);
+  }
+
+  /* ---------- Notes ---------- */
+  var ICON = {
+    watch:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 21h20L12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v5M12 18v.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+    ok:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m7.5 12.5 3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    info:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'
+  };
+  var TAG = {watch:'Worth a look', ok:'Looks good', info:'For your information'};
+  function renderNotes(){
+    var n = [], b = data.body, r = data.room, h = data.vitals;
+    if (b.apnea > 0){
+      n.push({sev:'watch', t: b.apnea + ' breathing pause' + (b.apnea > 1 ? 's' : ''),
+        p:'Flagged ' + (b.apnea > 1 ? b.apnea + ' times' : 'once') + '. Tell your doctor if it repeats.'});
+    } else {
+      n.push({sev:'ok', t:'No breathing pauses', p:'No apnea events were detected during this period.'});
+    }
+    if (r.light > SPEC.light.hi){
+      n.push({sev:'watch', t:'Your room was bright', p:'Light reached ' + fmt(r.light, 0) + ' lux. Under 10 lux is best for sleep.'});
+    } else {
+      n.push({sev:'ok', t:'Dark room', p:'Light stayed low, which supports deeper sleep.'});
+    }
+    var so = status('spo2', h.spo2);
+    n.push(so.st === 'ok'
+      ? {sev:'ok', t:'Oxygen levels are healthy', p:'Blood oxygen is ' + fmt(h.spo2, 1) + '%, within the normal range.'}
+      : {sev:'watch', t:'Oxygen is lower than usual', p:'Blood oxygen is ' + fmt(h.spo2, 1) + '%. Check the sensor fit; see a doctor if it stays low.'});
+    var d = Math.round(h.hr.value - h.hr.baseline);
+    n.push(d < 0 ? {sev:'ok', t:'Calmer heart rate than usual', p:Math.abs(d) + ' bpm below your baseline, a sign of relaxation.'}
+         : d > 0 ? {sev:'info', t:'Heart rate above baseline', p:'Your heart rate is ' + d + ' bpm above your baseline.'}
+         : {sev:'ok', t:'Heart rate at baseline', p:'Your heart rate matches your usual level.'});
+    var order = {watch:0, info:1, ok:2};
+    n.sort(function(a, b2){ return order[a.sev] - order[b2.sev]; });
+    $('#noteList').innerHTML = n.map(function(x){
+      return '<div class="note ' + x.sev + '" title="' + x.p + '">' + ICON[x.sev] + '<div class="nh"><h3>' + x.t + '</h3><span class="tag">' + TAG[x.sev] + '</span></div><p>' + x.p + '</p></div>';
+    }).join('');
+  }
+
+  /* ---------- Summary ---------- */
+  var C = 2 * Math.PI * 52;
+  function renderSummary(first){
+    var sc = data.score;
+    $('#scoreNum').textContent = sc;
+    var fg = $('#ringFg');
+    fg.setAttribute('class', 'fg' + (sc >= 75 ? '' : sc >= 50 ? ' watch' : ' alert'));
+    var off = C * (1 - sc / 100);
+    if (first){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ fg.style.strokeDashoffset = off; }); }); }
+    else fg.style.strokeDashoffset = off;
+    $('#verdict').textContent = sc >= 85 ? 'Restful night' : sc >= 70 ? 'Fairly restful night' : sc >= 50 ? 'Disturbed night' : 'Poor night';
+    $('#ringWrap').setAttribute('aria-label', 'Sleep quality score ' + sc + ' out of 100');
+    var a = data.body.apnea;
+    $('#verdictSub').textContent = a > 0 ? a + ' minor apnea event detected' : 'No breathing pauses detected';
+    var rest = Math.max(0, 100 - data.deep - data.rem);
+    $('#stack').innerHTML =
+      '<span style="width:' + data.deep + '%;background:var(--stage-deep)"></span>' +
+      '<span style="width:' + data.rem + '%;background:var(--stage-rem)"></span>' +
+      '<span style="width:' + rest + '%;background:var(--stage-light)"></span>';
+    $('#split').innerHTML =
+      '<div><i style="background:var(--stage-deep)"></i>Deep sleep<b>' + data.deep + '%</b></div>' +
+      '<div><i style="background:var(--stage-rem)"></i>REM sleep<b>' + data.rem + '%</b></div>' +
+      '<div><i style="background:var(--stage-light)"></i>Light and awake<b>' + rest + '%</b></div>';
+  }
+
+  /* ---------- Hypnogram ---------- */
+  var STAGE = {
+    A:{name:'Awake',        row:0, c:'--stage-awake'},
+    R:{name:'REM sleep',    row:1, c:'--stage-rem'},
+    L:{name:'Light sleep',  row:2, c:'--stage-light'},
+    D:{name:'Deep sleep',   row:3, c:'--stage-deep'}
+  };
+  var ROWS = ['Awake','REM','Light','Deep'];
+  function ago(m){ var h = Math.floor(m / 60), mm = m % 60; return h ? (mm ? h + ' h ' + mm + ' min' : h + ' h') : mm + ' min'; }
+  function drawHypno(){
+    var wrap = $('#hypno'), tip = $('#tip');
+    var W = Math.max(wrap.clientWidth, 260), H = Math.max(wrap.clientHeight, 120), narrow = W < 480;
+    var padL = narrow ? 46 : 58, padR = 10, padT = 12, padB = 26;
+    var seq = data.stages.split(''), n = seq.length, segW = (W - padL - padR) / n;
+    var plotH = H - padT - padB, rowH = plotH / 4;
+    var barH = Math.min(14, rowH * 0.55);
+    var yc = function(r){ return padT + rowH * (r + 0.5); };
+    var s = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Sleep stage chart for the last 4 hours">';
+
+    for (var r = 0; r <= 4; r++){
+      var y = padT + rowH * r;
+      s += '<line x1="' + padL + '" x2="' + (W - padR) + '" y1="' + y + '" y2="' + y + '" style="stroke:var(--grid-major)" stroke-width="1"/>';
+    }
+    for (var i = 0; i <= n; i++){
+      var x = padL + i * segW, major = i % 4 === 0;
+      s += '<line x1="' + x + '" x2="' + x + '" y1="' + padT + '" y2="' + (padT + plotH) + '" style="stroke:' + (major ? 'var(--grid-major)' : 'var(--grid)') + '" stroke-width="1"/>';
+    }
+    ROWS.forEach(function(name, r){
+      s += '<text x="' + (padL - 8) + '" y="' + (yc(r) + 4) + '" text-anchor="end" style="fill:var(--ink-2);font-size:12px">' + name + '</text>';
+    });
+    ['4 h ago', '3 h', '2 h', '1 h', 'Now'].forEach(function(l, k){
+      var x = padL + k * 4 * segW;
+      s += '<text x="' + (k === 4 ? W - padR : x) + '" y="' + (H - 7) + '" text-anchor="' + (k === 4 ? 'end' : 'middle') + '" style="fill:var(--ink-2);font-size:12px">' + l + '</text>';
+    });
+
+    var bands = '', bars = '', links = '', hits = '', prevRow = null;
+    seq.forEach(function(code, i){
+      var isApnea = code === 'X', st = STAGE[isApnea ? 'L' : code];
+      var x0 = padL + i * segW, cy = yc(st.row), cx = x0 + segW / 2;
+      if (prevRow !== null && prevRow !== st.row){
+        links += '<line x1="' + x0 + '" x2="' + x0 + '" y1="' + yc(prevRow) + '" y2="' + cy + '" style="stroke:var(--ink-2)" stroke-opacity=".55" stroke-width="1.6"/>';
+      }
+      prevRow = st.row;
+      if (isApnea){
+        bands += '<rect x="' + x0 + '" y="' + padT + '" width="' + segW + '" height="' + plotH + '" style="fill:var(--alert)" fill-opacity=".15"/>' +
+                 '<line x1="' + cx + '" x2="' + cx + '" y1="' + (padT + 18) + '" y2="' + (cy - barH / 2 - 2) + '" style="stroke:var(--alert)" stroke-width="1.5" stroke-dasharray="3 3"/>' +
+                 '<circle cx="' + cx + '" cy="' + (padT + 10) + '" r="8" style="fill:var(--alert)"/>' +
+                 '<text x="' + cx + '" y="' + (padT + 14.5) + '" text-anchor="middle" style="fill:#fff;font-size:12px;font-weight:700">!</text>';
+        bars += '<rect x="' + (x0 + 2) + '" y="' + (cy - barH / 2) + '" width="' + (segW - 4) + '" height="' + barH + '" rx="' + (barH / 2) + '" style="fill:var(--stage-light);stroke:var(--alert)" stroke-width="2"/>';
+      } else {
+        bars += '<rect x="' + (x0 + 2) + '" y="' + (cy - barH / 2) + '" width="' + (segW - 4) + '" height="' + barH + '" rx="' + (barH / 2) + '" style="fill:var(' + st.c + ')"/>';
+      }
+      var startMin = (n - i) * 15, endMin = (n - i - 1) * 15;
+      var label = (isApnea ? 'Apnea event, ' : '') + st.name + ', ' + ago(startMin) + ' to ' + (endMin === 0 ? 'now' : ago(endMin) + ' ago');
+      hits += '<rect class="hit" tabindex="0" data-i="' + i + '" x="' + x0 + '" y="' + padT + '" width="' + segW + '" height="' + plotH + '" aria-label="' + label + '"/>';
+    });
+    s += bands + links + bars + hits + '</svg>';
+
+    var old = $('svg', wrap); if (old) old.remove();
+    wrap.insertAdjacentHTML('afterbegin', s);
+
+    function show(i){
+      var code = seq[i], isApnea = code === 'X', st = STAGE[isApnea ? 'L' : code];
+      var startMin = (n - i) * 15, endMin = (n - i - 1) * 15;
+      tip.innerHTML = '<b>' + (isApnea ? 'Apnea event flagged' : st.name) + '</b>' +
+        (isApnea ? 'During light sleep<br>' : '') +
+        ago(startMin) + ' to ' + (endMin === 0 ? 'now' : ago(endMin) + ' ago');
+      var x = Math.max(85, Math.min(W - 85, padL + i * segW + segW / 2));
+      tip.style.left = x + 'px';
+      tip.style.top = Math.max(40, yc(st.row) - 12) + 'px';
+      tip.classList.add('on');
+    }
+    function hide(){ tip.classList.remove('on'); }
+    wrap.querySelectorAll('.hit').forEach(function(el){
+      var i = +el.getAttribute('data-i');
+      el.addEventListener('mouseenter', function(){ show(i); });
+      el.addEventListener('mouseleave', hide);
+      el.addEventListener('focus', function(){ show(i); });
+      el.addEventListener('blur', hide);
+      el.addEventListener('touchstart', function(){ show(i); }, {passive:true});
+    });
+  }
+
+  /* ---------- ECG trace (heart rate card) ---------- */
+  var cv = $('#ecg'), ctx = cv.getContext('2d'), colors = {line:'#0B7A82', grid:'rgba(11,122,130,.2)'};
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function readColors(){
+    var cs = getComputedStyle(document.documentElement);
+    colors.line = cs.getPropertyValue('--brand').trim() || colors.line;
+    colors.grid = cs.getPropertyValue('--grid-major').trim() || colors.grid;
+  }
+  function sizeEcg(){
+    var rect = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(rect.width * dpr); cv.height = Math.round(rect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function g(x, c, w, a){ return a * Math.exp(-Math.pow((x - c) / w, 2)); }
+  function wave(p){ return g(p,.16,.035,.12) + g(p,.30,.010,-.14) + g(p,.33,.012,1) + g(p,.365,.012,-.22) + g(p,.62,.06,.22); }
+  function drawEcg(nowMs){
+    var w = cv.clientWidth, h = cv.clientHeight;
+    if (!w) return;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = colors.grid; ctx.lineWidth = 1; ctx.beginPath();
+    for (var x = 0; x < w; x += 13){ ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, h); }
+    for (var y = 0; y < h; y += 13){ ctx.moveTo(0, y + .5); ctx.lineTo(w, y + .5); }
+    ctx.stroke();
+    var speed = 90, T = 60 / bpm;
+    ctx.strokeStyle = colors.line; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.beginPath();
+    for (var px = 0; px <= w; px += 1.5){
+      var t = nowMs / 1000 - (w - px) / speed;
+      var ph = (((t % T) + T) % T) / T;
+      var yy = h * 0.74 - wave(ph) * h * 0.6;
+      if (px === 0) ctx.moveTo(px, yy); else ctx.lineTo(px, yy);
+    }
+    ctx.stroke();
+  }
+  function loop(t){ drawEcg(t); if (!reduce.matches) requestAnimationFrame(loop); }
+  function startEcg(){ readColors(); sizeEcg(); if (reduce.matches) drawEcg(1200); else requestAnimationFrame(loop); }
+
+  /* ---------- Live demo ---------- */
+  var timer = null;
+  function jit(v, amt, lo, hi, dec){
+    var nv = v + (Math.random() * 2 - 1) * amt;
+    return +Math.max(lo, Math.min(hi, nv)).toFixed(dec);
+  }
+  function tick(){
+    var d = data;
+    d.vitals.hr.value = Math.round(jit(d.vitals.hr.value, 1.2, 70, 84, 0));
+    d.vitals.spo2 = jit(d.vitals.spo2, .25, 95.5, 99, 1);
+    d.vitals.resp = jit(d.vitals.resp, .35, 12.5, 17, 1);
+    d.body.hrv = jit(d.body.hrv, .8, 33, 50, 1);
+    d.body.hrStability = jit(d.body.hrStability, .15, 5.5, 8, 1);
+    d.body.temp = jit(d.body.temp, .04, 36.6, 37.1, 2);
+    d.body.movement = jit(d.body.movement, .004, .01, .08, 3);
+    d.body.skin = jit(d.body.skin, .06, 3, 4.6, 2);
+    d.room.temp = jit(d.room.temp, .06, 20.5, 22.5, 1);
+    d.room.humidity = jit(d.room.humidity, .3, 47, 56, 1);
+    d.room.light = Math.round(jit(d.room.light, 10, 230, 300, 0));
+    d.room.noise = jit(d.room.noise, .6, 28, 34, 1);
+    renderAll(false);
+    $('#syncText').textContent = 'Live · ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  }
+  var toggle = $('#liveToggle');
+  toggle.addEventListener('click', function(){
+    var on = toggle.getAttribute('aria-checked') !== 'true';
+    toggle.setAttribute('aria-checked', on);
+    $('#sync').classList.toggle('live', on);
+    if (on){ tick(); timer = setInterval(tick, 2000); }
+    else { clearInterval(timer); data = clone(SNAPSHOT); renderAll(false); $('#syncText').textContent = 'Synced just now'; }
+  });
+
+  /* ---------- Theme toggle (light is the default) ---------- */
+  var root = document.documentElement, themeBtn = $('#themeBtn');
+  function syncThemeBtn(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    themeBtn.title = dark ? 'Switch to light theme' : 'Switch to dark theme';
+  }
+  themeBtn.addEventListener('click', function(){
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try{ localStorage.setItem('sleep-theme', next); }catch(e){}
+    syncThemeBtn();
+  });
+  syncThemeBtn();
+
+  /* ---------- Orchestration ---------- */
+  function renderAll(first){ renderVitals(); renderBody(); renderRoom(); renderNotes(); renderSummary(first); }
+  // Push real readings from your sensors or model into the page.
+  window.updateSleepDashboard = function(next){
+    data = Object.assign(clone(SNAPSHOT), next || {});
+    renderAll(false); drawHypno();
+  };
+
+  renderAll(true);
+  drawHypno();
+  startEcg();
+
+  var lastW = 0, lastH = 0;
+  function onResize(){
+    var wrap = $('#hypno');
+    if (wrap.clientWidth !== lastW || wrap.clientHeight !== lastH){ lastW = wrap.clientWidth; lastH = wrap.clientHeight; drawHypno(); }
+    sizeEcg(); if (reduce.matches) drawEcg(1200);
+  }
+  if ('ResizeObserver' in window){ new ResizeObserver(onResize).observe(document.body); new ResizeObserver(onResize).observe($('#hypno')); }
+  else window.addEventListener('resize', onResize);
+  try{
+    new MutationObserver(function(){ readColors(); if (reduce.matches) drawEcg(1200); }).observe(root, {attributes:true, attributeFilter:['data-theme']});
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

@@ -331,7 +331,7 @@ Light follows a physically driven event-based model:
 ┌──────────────────────────────────────────────────────────────┐
 │  STAGE 7: MOPSO Hyperparameter Optimisation (optional)       │
 │  • Internally builds CNN–GRU–LSTM variants (Stages 5-6)     │
-│  • Quick-trains each variant (~5 epochs) to evaluate fitness │
+│  • Quick-trains each variant (3 epochs) to evaluate fitness  │
 │  • 3 objectives: accuracy, false alarm rate, param count     │
 │  • Selects Pareto-optimal hyperparameters for final model    │
 │  • Re-windows data if MOPSO selects a different window size  │
@@ -350,7 +350,7 @@ Light follows a physically driven event-based model:
 │            Concatenate → Dense → Softmax(4)                  │
 │  • Train+Val merged (85%) with 10% monitor hold-out          │
 │  • Focal Loss + Adam + cosine LR + early stopping            │
-│  • Full training (50+ epochs), saves best checkpoint         │
+│  • Full training (up to 90 epochs), saves best checkpoint    │
 └───────────────────────┬──────────────────────────────────────┘
                         │
                         ▼
@@ -628,7 +628,7 @@ $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{FL}} + \lambda \sum_{\mathbf{W
 
 ## 11. Stage 7 — MOPSO Hyperparameter Optimisation
 
-> **Execution order note**: When the `--mopso` flag is passed, MOPSO runs **before** the final model is built and trained. It performs a multi-objective search over 8 hyperparameters, internally building and quick-training candidate models (typically 5 epochs each) to evaluate fitness. Once the Pareto-optimal hyperparameters are selected, they are used to construct and train the final model in Stage 8.
+> **Execution order note**: When the `--mopso` flag is passed, MOPSO runs **before** the final model is built and trained. It performs a multi-objective search over 8 hyperparameters, internally building and quick-training candidate models for 3 epochs each to evaluate fitness. Once the Pareto-optimal hyperparameters are selected, they are used to construct and train the final model in Stage 8.
 
 ### 11.1 Multi-Objective Particle Swarm Optimisation
 
@@ -713,7 +713,7 @@ With `clipnorm=1.0`: if $\|\nabla\| > 1.0$, gradients are rescaled to unit norm.
 
 $$\eta_{\text{epoch}} = \eta_0 \cdot \frac{1}{2}\left(1 + \cos\left(\frac{\pi \cdot \text{epoch}}{E_{\text{max}}}\right)\right)$$
 
-Where $\eta_0 = 10^{-3}$ (or MOPSO-found value) and $E_{\text{max}} = 50$.
+Where $\eta_0 = 10^{-3}$ (or MOPSO-found value) and $E_{\text{max}} = 90$.
 
 ### 12.3 Callbacks
 
@@ -821,7 +821,7 @@ Window: X ∈ ℝ^{30×22}  with label = Label[t + 15]
         ▼
  ┌── MOPSO (optional, runs FIRST) ──────────────────────┐
  │  For each particle (hyperparameter set):              │
- │    Quick-build model → train 5 epochs → evaluate      │
+ │    Quick-build model → train 3 epochs → evaluate      │
  │    Objectives: [1-Acc, FAR, log₁₀(params)]           │
  │  → Select best from Pareto front                      │
  │  → Inject optimal hyperparams into model config       │
@@ -851,7 +851,7 @@ CNN:    Conv1D → BN → ReLU → Residual → SE → MaxPool
   Focal Loss: ℒ = -αₜ(1-pₜ)^γ log(pₜ)  +  λΣ‖W‖²
         │
         ▼
-  Full Training: Adam + cosine LR + early stopping (50+ epochs)
+  Full Training: Adam + cosine LR + early stopping (up to 90 epochs)
         │
         ▼
   Metrics: Acc, κ, FAR, SE, HRV Recovery

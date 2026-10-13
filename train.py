@@ -78,7 +78,7 @@ DEFAULT_MODEL_CFG = {
 }
 
 DEFAULT_TRAINING_CFG = {
-    "epochs": 50,
+    "epochs": 90,
     "batch_size": 128,
     "learning_rate": 5e-4,
     "lr_schedule": "reduce_on_plateau",
